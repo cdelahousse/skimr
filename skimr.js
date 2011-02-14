@@ -1,31 +1,55 @@
 (function () {
 	
+	//$1script.src = 'https://www.google.com/jsapi';
+	//$1script.src = 'https://www.google.com/jsapi?key=ABQIAAAAQuJrhzS5DE3nDE6DUIwBIRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxTjUjgZ5pPspw9UA9QKlOGRSPa7aw';
+	//$1script.setAttribute('type','text/javascript');
+	//document.head.appendChild($1script);
+	//console.log(window.google,'window.google');
+	console.log(window.google.load,'berfore');
+	google.load('feeds','1',{"callback" : init});
 
-	var rss_url = getRSSLink(); 
 
-	console.log(rss_url);
-	//var rss_url = 'mashable.xml';//getRSSLink(); 
-	 var rss_doc = getRSSDoc(rss_url);
-	console.log(rss_doc);
+
+  //<script src="https://www.google.com/jsapi" type="text/javascript"></script>
 	
-	//TODO clean this up, prevent erros
-	var rss_title = rss_doc.getElementsByTagName('title')[0].firstChild.nodeValue;
+	function init() { 
+		var rss_url = getRSSLink(); 
 
-	//var rss_desc = rss_doc.getElementsByTagName('description')[0].firstChild.nodeValue;
-	//console.log(typeof rss_desc);
+		var google_feed = new google.feeds.Feed(rss_url);
+		google_feed.setResultFormat(google.feeds.Feed.XML_FORMAT);
+		google_feed.setNumEntries(30);
+			
+		google_feed.load(function(results){
+			var rss_doc = results.xmlDocument;
+			postInit(rss_doc);
+			});
+	}
+	
+	function postInit(rss_doc){
 
-	var items =	rss_doc.getElementsByTagName('item');
-	//console.log(items);
-	var parsed_items = parseItems(items);
-	//console.log(parseItems(items));
-	var html = buildHtmlNodes(parsed_items);
- 	var css = buildCss();
 
-	document.body.appendChild(css);
-	document.body.appendChild(html);
- 	//Scans the <link> tags. Searches for type - application/rss+xml and returns
- 	//the hypertext reference. If none, returns false
- 	//
+		//console.log(rss_doc,'rss_doc');
+
+		//TODO clean this up, prevent erros
+		//var	feed_title = rss_doc.getElementsByTagName('title')[0].firstChild.nodeValue;
+
+		//var feed_desc = rss_doc.getElementsByTagName('description')[0].firstChild.nodeValue;
+		//console.log(rss_desc);
+
+
+		var items =	rss_doc.getElementsByTagName('item');
+		//console.log(items);
+		var parsed_items = parseItems(items);
+		//console.log(parseItems(items));
+		var html = buildHtmlNodes(parsed_items);
+		var css = buildCss();
+
+		document.body.appendChild(css);
+		document.body.appendChild(html);
+		//Scans the <link> tags. Searches for type - application/rss+xml and returns
+		//the hypertext reference. If none, returns false
+		//
+	}
 	function getRSSLink () {
 		var	link_nodes = document.getElementsByTagName('link'),
 			rss_link;
@@ -43,19 +67,29 @@
 	}
  	
 	//Gets the RSS document via AJAX and then returns it as a xml object
-	function getRSSDoc(rss_url){
+	function getRSSDoc(rss_url) {
 		//TODO Make compatible with IE
 		
-
+		var response;
 		var request = new XMLHttpRequest();
-		var open = request.open("GET",rss_url,false); //TODO Convert to ASYNC so as to not lock up user's screen. Make sure to add a little waiting widget.
-		//var open = request.open("GET",rss_url,true); //xxx
-		//console.log(rss_url);
-		//console.log(open);
-		//request.open('GET', rss_url, FALSE);
-		request.send('');
+		//var open = request.open("GET",rss_url,false); //TODO Convert to ASYNC so as to not lock up user's screen. Make sure to add a little waiting widget.
+		 request.open('GET',rss_url,true); //xxx
+		//request.onReadyStateChange = handler(); 
+
+		request.send();
 		
 		return request.responseXML;
+
+
+
+		//return response;
+
+		//function handler(){
+			//console.log(request.readyState);
+			//console.log(request.status);
+			////return request.responseXML;
+			//response = request.responseXML;
+		//}
 	}
  
  	function parseItems(items) {
@@ -107,7 +141,7 @@
 '#skimr \{\n\
 	position: absolute;\n\
 	top:0;\n\
-	right:middle;\n\
+	right:50%;\n\
 	background-color: gold;\n\
 	\}\n\
 \n\
@@ -149,6 +183,8 @@
 		}
 		return div;
 	}
+
+	
  })();
 
 
