@@ -1,0 +1,3 @@
+﻿In chrome, I get empty collections when I do getElementsbyID(head) on Daringfireball
+
+Use 'feedlookup' feature
