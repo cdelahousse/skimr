@@ -1,3 +1,32 @@
-﻿In chrome, I get empty collections when I do getElementsbyID(head) on Daringfireball
+﻿Use 'feedlookup' feature as fallback
 
-Use 'feedlookup' feature
+Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script tag
+
+offset each item a bit to the left
+
+fix smashing magazine footer
+
+add dasboard to be stuck to bottom or top of frame: quit application, go to skmir hopage, next feeds, prev feeds
+
+when user clicks on link, short description appears underneight
+
+when user runs bookmarklet and he's scrolled down, scroll window up
+
+preload next feeds entries
+
+change location with hashtag so that the user can "go back" to get rid of the screen
+
+After link list, add extra div saying: STOP SCROLLING NOW OR END UP IN THE ABYYSSS!!
+
+Add quick resume of article beneath title link. This could eventually be a function that searches for keyword density
+
+Add Error handling
+
+If can't find feed, warn user
+
+Add function that if both atom and RSS feed are shown but Atom feed appears first, to still take RSS feed
+
+DONE:
+use png transparency. Incorporate via data URI
+Add dates
+fix full height html overlay
