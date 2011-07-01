@@ -1,18 +1,23 @@
-﻿Use 'feedlookup' feature as fallback
+﻿fix full height html overlay
+
+preload next feeds entries
+
+bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
+
+Create skimr object and throw all properties and methods into it!
+
+Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object
+
+Convert all loops into either recursions OR flip the counters to count DOWN to zero
+
+move date to right of title
+
+convert date to simpler (dd/mm/yyy)
 
 Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script tag
 
 offset each item a bit to the left
 
-fix smashing magazine footer
-
-add dasboard to be stuck to bottom or top of frame: quit application, go to skmir hopage, next feeds, prev feeds
-
-when user clicks on link, short description appears underneight
-
-when user runs bookmarklet and he's scrolled down, scroll window up
-
-preload next feeds entries
 
 change location with hashtag so that the user can "go back" to get rid of the screen
 
@@ -22,11 +27,16 @@ Add quick resume of article beneath title link. This could eventually be a funct
 
 Add Error handling
 
-If can't find feed, warn user
+If can't find feed, warn user: this means modifying getFeedURL and goog Feed lookup fallback to return false if nothing's found.
 
-Add function that if both atom and RSS feed are shown but Atom feed appears first, to still take RSS feed
+if both atom and RSS feed are shown but Atom feed appears first, to still take RSS feed
+
+FUCNTIONALITY TO ADD:
+-divide skmir window in two. The first thing to appear on right screen is how to use skimr
+-when user hovers on link, short description appears to the right
 
 DONE:
 use png transparency. Incorporate via data URI
 Add dates
-fix full height html overlay
+when user runs bookmarklet and he's scrolled down, scroll window up
+1.Use 'feedlookup' feature as fallback

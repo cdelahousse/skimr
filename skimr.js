@@ -39,7 +39,7 @@
 				loadFeedAPI();
 			}
 		};
-	} else {  //Others
+	} else {  //Other browsers, the decent and good ones (not IE)
 		google_tag.onload = function(){
 			loadFeedAPI();
 		}; 
@@ -68,14 +68,10 @@
 
 		console.log(rss_url); //xxx 
 
-		//If getRSSLink function can't find a link, use Feed API's feed lookup
-		if (!rss_url) {
-			rss_url = googleFeedLookup(window.location);
-			console.log('google feed lookup');
-		console.log(rss_url); //xxx 
-		}
+	
 		var google_feed = new google.feeds.Feed(rss_url);
-		
+		if (google_feed) console.log('Google feed API Loaded!'); //To test if FEED API gets loaded
+
 		//Initialise feed settings
 		google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
 		google_feed.includeHistoricalEntries();
@@ -91,6 +87,7 @@
 	function postFeedInit(results) {
 		var entries;
 		
+		console.log('Google Feed API results returned!');
 
 		//TODO WE NEED TO IMPLEMENT PROPER ERROR HANDLING
 		// If feed doesn't load or doesn't exist, exit app
@@ -106,6 +103,7 @@
 
 		entries = results.feed.entries; 
 
+
 		//Element that houses feed links
 		list_div = buildListDiv(entries);
 		//Append to main element
@@ -116,7 +114,7 @@
 	//the hypertext reference. If none, returns false
 	function getRSSLink() {
 		var	link_nodes = document.getElementsByTagName('link'),
-			rss_link = false, //false until proven found. Initialised as lost
+			rss_link = false, //false until proven found. Initialised as not found
 			n = link_nodes.length;
 
 		for (var i = 0; i < n; i++) {
@@ -139,18 +137,26 @@
 					var absolute_path = (rss_link.match(/^\//)) ? '': window.location.pathname;
 					rss_link = window.location.protocol + '//' + window.location.hostname + absolute_path + rss_link;
 				}
-				//If we've found a link, we don't need to continue looks
+				//If we've found a link, we don't need to continue looping
 				break;
 			}
 		}
+
+		//If the URL isn't found (ie. rss_link = false),  use Feed API's feed lookup
+		if (!rss_link) {
+			rss_link = googleFeedLookup(window.location);
+		}
+
 		//console.log(rss_link)
 		return rss_link;
-		//TODO Add fallback methods like google.feed.feedlookup
 	}
 	
 	function googleFeedLookup (url){
-			//FIX THIS  TODO
-		
+		return google.feeds.lookupFeed(url,function(results){
+				var feed = results.url || false;
+				console.log('Google Feed Lookup Returned: ',feed)
+				return feed;
+				});
 	}
 
 	//builds that tag that will load the google api
@@ -186,14 +192,15 @@
 				+ 'min-width: 100% !important; margin: 0 !important; '
 				+ 'max-width: 100% !important; \}\n'//For full page veil
 
-			+ '#skimr, #skimr * \{padding: 0, margin: 0;\}\n'
+			+ '#skimr, #skimr * \{padding: 0; margin: 0;\}\n' // reset
 
-			+ '#skimr \{position: absolute;top:0;left:0;height: 100%; width:100%; '
+			+ '#skimr \{position: absolute;top:0;left:0;min-height:100%; width:100%; '
 				+ 'background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAE'
 				+ 'AAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGC4DAAA2ADUwvUnWwAAAABJRU5E'
 				+ 'rkJggg==) transparent repeat; '//cont'd
-				+ 'margin: 0; z-index: 99999; font-weight: normal;'//cont'd
-				+ ' font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; \}\n'//cont'd
+				+ 'margin: 0; z-index: 99999; font-weight: normal; '//cont'd
+				+ 'overflow: hidden; padding-bottom: 30px; '//clearfix and padding
+				+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; \}\n'//cont'd
 
 			+ '#skimr-loading \{width: 100%; background-color: #FFF; color: #000;' 
 				+ 'text-align: center;border-bottom: 1px solid #999;\}\n'//cont'd
@@ -293,8 +300,9 @@
 	}
 
 	function exitApp() {
-		skimr_div.parentNode.removeChild(skimr_div); 
-		google_tag.parentNode.removeChild(google_tag);
+		skimr_div.parentNode.removeChild( skimr_div ); 
+		google_tag.parentNode.removeChild( google_tag );
+		google_tag.parentNode.removeChild( css_tag );
 		
 		
 	//todo Delete script tag	
