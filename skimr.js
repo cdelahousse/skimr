@@ -64,14 +64,14 @@ skimr.loadFeedAPI = function() {
 	google = window.google;
 
 	google.load('feeds', '1', {
-		"callback": initFeed, //Once the feed api is loaded, it calls initFeed() 
+		"callback": skimr.initFeed, //Once the feed api is loaded, it calls initFeed() 
 		"nocss": true
 		});
 }
 
-//PART 3
+
 //Once google feed api is loaded, initalise the feed
-initFeed = function () {
+skimr.initFeed = function () {
 
 	var rss_url = skimr.getRSSLink();
 
