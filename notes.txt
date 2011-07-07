@@ -5,8 +5,12 @@ preload next feeds entries
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
 Create skimr object and throw all properties and methods into it!
+DO IT jQuery STYLE!!!. Look at respond.js in HTML boilerplate
+
 
 Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object
+
+Create private var for document.getElementByID. var this.ID = document.getElementByID. Invoke by ID('skimr'); 
 
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
 
@@ -16,8 +20,11 @@ convert date to simpler (dd/mm/yyy)
 
 Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script tag
 
-offset each item a bit to the left
+redeclare undefined as undefined
 
+cover script to use "use strict". ES5 shizzat
+
+offset each item a bit to the left
 
 change location with hashtag so that the user can "go back" to get rid of the screen
 

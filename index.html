@@ -10,7 +10,7 @@
   <!--<script src="https://www.google.com/jsapi?key=ABQIAAAAQuJrhzS5DE3nDE6DUIwBIRT2yXp_ZAY8_ufC3CFXhHIE1NvwkxTjUjgZ5pPspw9UA9QKlOGRSPa7aw" type="text/javascript"></script>-->
 	
 </head>
-<body>
+<body bgcolor='pink'>
 
 
 <div id="accessibility">
@@ -39,42 +39,14 @@ null;c()}};else a.onload=function(){c()}})(); ">Run</a>
 
   <!--<script>(function(){document.head.appendChild($1script = document.createElement('script')).src='http://localhost/js/skimr/skimr.js';})();</script>-->
 
-<script>window.onload =
+<script> 
 	(function(){
-
-	var google_tag;
-
-		google_tag = document.createElement('script');
-		google_tag.src = 'https://www.google.com/jsapi';
-		google_tag.setAttribute('type','text/javascript');
-		document.getElementsByTagName('head')[0].appendChild(google_tag);
-
-
-		//the Google JS API is weird and takes a while to load,
-		//so we need to be sure to load it completely before we continue, hence the onload.
-		//http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
-
-		if (google_tag.readyState){  //IE
-			google_tag.onreadystatechange = function(){
-			if (google_tag.readyState == "loaded" || google_tag.readyState == "complete"){
-					google_tag.onreadystatechange = null;
-					load_script();
-				}
-		};
-		} else {  //Others
-			google_tag.onload = function(){
-				load_script();
-			};
-		}
-
-	function load_script(){
 		var	my_script_tag = document.createElement('script');
 		my_script_tag.setAttribute('type','text/javascript');
 		my_script_tag.src ='http://localhost/js/skimr/skimr.js';
-		document.getElementsByTagName('head')[0].appendChild(my_script_tag);
-		}
-		
-}());</script>
+		document.getElementsByTagName('head')[0].appendChild(my_script_tag); 
+	}());
+</script>
 
 
 'https://www.google.com/jsapi';
