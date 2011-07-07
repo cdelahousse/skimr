@@ -14,13 +14,16 @@ Create private var for document.getElementByID. var this.ID = document.getElemen
 
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
 
+Convert next, exit and previous button to event deleagetion
+
 move date to right of title
 
 convert date to simpler (dd/mm/yyy)
 
-Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script tag
+Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script (head?) tag
 
-redeclare undefined as undefined
+Create throws for all errors and Catch at the end of script
+Add Error handling
 
 cover script to use "use strict". ES5 shizzat
 
@@ -31,8 +34,6 @@ change location with hashtag so that the user can "go back" to get rid of the sc
 After link list, add extra div saying: STOP SCROLLING NOW OR END UP IN THE ABYYSSS!!
 
 Add quick resume of article beneath title link. This could eventually be a function that searches for keyword density
-
-Add Error handling
 
 If can't find feed, warn user: this means modifying getFeedURL and goog Feed lookup fallback to return false if nothing's found.
 
@@ -46,4 +47,5 @@ DONE:
 use png transparency. Incorporate via data URI
 Add dates
 when user runs bookmarklet and he's scrolled down, scroll window up
-1.Use 'feedlookup' feature as fallback
+1redeclare undefined as undefined
+.Use 'feedlookup' feature as fallback

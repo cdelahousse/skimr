@@ -15,18 +15,32 @@ var skimr = {},
 		skimr_div,//container div
 		loading_div,
 		list_div,
-		dashboard_div;
+		dashboard_div,
 
+//Private Properties
+		entries_per_page = 50,  //Entries per page
+		num_max_entries = 250, //Google feed API maxes out at 250
+		rss_url,
+		current_offset = 0,
+		current_results = null;
+
+//Initilisation
 skimr.init = function () {
-	google_tag = skmir.buildGoogleTag();
+
+	var body = document.body;
+
+	rss_url = skimr.getRSSLink(); //Find RSS URL
+	//TODO: if getRSSLink fails, exit app with warning to the user
+
+	google_tag = skimr.buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
 
 	//Add CSS style tag 
 	css_tag = skimr.buildCss();
-	document.body.appendChild( css_tag );
+	body.appendChild( css_tag );
 
 	skimr_div = skimr.buildSkimrDiv();
-	document.body.appendChild( skimr_div );
+	body.appendChild( skimr_div );
 
 	//Scroll to top
 	window.scroll(0,0);
@@ -70,26 +84,31 @@ skimr.loadFeedAPI = function() {
 }
 
 
-//Once google feed api is loaded, initalise the feed
-skimr.initFeed = function () {
+// (re)initalise the feed
+skimr.initFeed = function (num,callback) {
 
-	var rss_url = skimr.getRSSLink();
+	var google_feed; //Google Feed object
 
-	//TODO: if getRSSLink fails, exit app with warning to the user
+	//Number of entries to request
+	//Default to default entries per page if none specified, the number used for first page
+	num = num || entries_per_page; 
+
+	//Callback to be called once feed has been received by GoogFeedAPI
+	//Default to postFeedInit
+	callback = callback || skimr.postFeedInit;
 
 	//TODO: if Google_Feed doesn't load, exit app with warning to the user
-	var google_feed = new google.feeds.Feed(rss_url);
-
+	google_feed = new google.feeds.Feed(rss_url);
+	
 	//Initialise feed settings
 	google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
 	google_feed.includeHistoricalEntries();
-	google_feed.setNumEntries(50);
+	google_feed.setNumEntries(num);
 
-	//Once feed is loaded, callback funtion PostFeedInit
-	google_feed.load(skimr.postFeedInit);
+	//Once feed is loaded, callback funtion. Default: PostFeedInit
+	google_feed.load(callback);
 }
 
-//PART 4
 //What to do once feed has been initialised
 //var results is passed for the google feed api (see initFeed)
 skimr.postFeedInit = function (results) {
@@ -106,13 +125,26 @@ skimr.postFeedInit = function (results) {
 	
 	//Once the feed is initialissed, no need for loading msg
 	loading_div.parentNode.removeChild(loading_div);
-	
 
-	entries = results.feed.entries; 
-
+	entries = current_results = results.feed.entries; 
 
 	//Element that houses feed links
-	list_div = skimr.buildListDiv(entries);
+	list_div = skimr.buildListDiv();
+	//Append to main element
+	skimr_div.appendChild(list_div);
+
+	//Preload remaining for pagination
+	skimr.initFeed(num_max_entries,function (){
+		console.log(this.feed.entries.length);
+		current_results = this.feed.entries;
+		 });
+}
+
+
+skimr.pagination = function(offset) {
+	list_div.parentNode.removeChild(list_div);
+	//Element that houses feed links
+	list_div = skimr.buildListDiv(offset);
 	//Append to main element
 	skimr_div.appendChild(list_div);
 }
@@ -135,8 +167,6 @@ skimr.getRSSLink = function () {
 		//console.log(node_type);	
 
 		//Get first RSS or Atom match
-		//TODO: Get this to create an array of matches and then 
-		//the rest of the script will figure out the best one.
 		if (node_type == 'application/rss+xml' || node_type == 'application/atom+xml') {
 
 			rss_link = current_node.getAttribute('href');
@@ -152,19 +182,16 @@ skimr.getRSSLink = function () {
 		}
 	}
 
-
-
-	//If the URL isn't found (ie. rss_link = false),  use Feed API's feed lookup
-	if (!rss_link) {
-		rss_link = skimr.googleFeedLookup(window.location);
-	}
-	//XXX REPLACE THIS WITH FOLLOWING 
-	//return rss_link || googleFeedLookup(window.location);
+	return rss_link || googleFeedLookup(location);
 	
-	return rss_link;
+	//return rss_link;
 }
 
 skimr.googleFeedLookup = function (url){
+	if (!google.feeds.lookupFeed) {
+		console.log('Google Feed Lookup not loaded');
+		return false;
+	}
 	return google.feeds.lookupFeed(url,function(results){
 		var feed = results.url || false;
 		console.log('Google Feed Lookup returned: ',feed)
@@ -250,24 +277,27 @@ skimr.buildSkimrDiv = function (){
 	return div;
 
 }
-skimr.buildListDiv = function (entries) {
-	var ol,
-		entry,
-		title_text,
-		title,
-		li,
-		span,
-		pub_date;
+skimr.buildListDiv = function (offset) {
+	var ul,
+			entry,
+			title_text,
+			title,
+			li,
+			span,
+			pub_date,
+			entries;
+	
+	ul = document.createElement('ul');
 
-	ol = document.createElement('ol');
+	ul.setAttribute('id', 'skimr-list');
 
-	ol.setAttribute('id', 'skimr-list');
-
-
+	offset = offset || 0; // If offset given, the work with that, if not, default 0
+	
+	entries = current_results;
 
 	//Creates anchor tags, adds hypertext reference
 	var n = entries.length; //XXX Is this variable needed?
-	for (var i = 0; i < n; i++) { //TODO Convert loop to decrement to zero
+	for (var i = offset; i < n; i++) { //TODO Convert loop to decrement to zero
 		entry = entries[i];
 
 		li = document.createElement('li'); 
@@ -281,21 +311,23 @@ skimr.buildListDiv = function (entries) {
 		
 		span = document.createElement('span');
 		pub_date = new Date(entry.publishedDate);
-		pub_date = pub_date.toLocaleDateString();
+		pub_date = pub_date.toLocaleDateString();// TODO Convert this to dd/mm/yyyy
 		pub_date = document.createTextNode(pub_date); 
 		span.appendChild(pub_date);
 
 		li.appendChild(a);
 		li.appendChild(span);
 
-		ol.appendChild(li); 
+		ul.appendChild(li); 
 	}
-	return ol;
+	console.log(ul);
+	return ul;
 }
 
 skimr.buildDashboard = function () {
 	var dashboard_div,
-			exit_anchor;
+			exit_anchor,
+			next_anchor;
 	//TODO Add document = document; //moves document global in to a local variable for performance
 
 	dashboard_div = document.createElement('div'); 
@@ -305,6 +337,7 @@ skimr.buildDashboard = function () {
 	exit_anchor.setAttribute('id', 'skimr-exit');
 	exit_anchor.appendChild(document.createTextNode('Exit'));
 
+	//TODO CONVERT THIS TO EVENT DELEGATAION
 	exit_anchor.onmouseover = function(){
 		exit_anchor.style.cursor = 'pointer'
 	};
@@ -313,18 +346,36 @@ skimr.buildDashboard = function () {
 	};
 	exit_anchor.onclick = skimr.exitApp;
 
+	next_anchor = document.createElement('a');
+	next_anchor.setAttribute('id','skimr-next');
+	next_anchor.appendChild(document.createTextNode('Next'));
+
+	next_anchor.onmouseover = function(){
+		next_anchor.style.cursor = 'pointer'
+	};
+	next_anchor.onmouseout = function(){
+		next_anchor.style.cursor='default'
+	};
+	next_anchor.onclick = function () {
+		current_offset += entries_per_page;
+		skimr.pagination(current_offset);
+	}
+
 	dashboard_div.appendChild(exit_anchor);
+	dashboard_div.appendChild(next_anchor);
 
 	return dashboard_div; 
 }
 
 skimr.exitApp = function () {
 	skimr_div.parentNode.removeChild( skimr_div ); 
+	css_tag.parentNode.removeChild( css_tag );
 	google_tag.parentNode.removeChild( google_tag );
-	google_tag.parentNode.removeChild( css_tag );
-	
 	//XXX can we delete the nodes using the delete keyword?
 	
+	//Delete global object;
+	delete skimr;
+
 //todo Delete script tag	
 	//var script_tagsdocument.getElementsByTagName('head')[0].findElementsByTagName('script');
 	//	for loop
@@ -334,6 +385,6 @@ skimr.exitApp = function () {
 }
 
 //Expose skimr to the global namespace
-window.skmir = skimr;
+window.skimr = skimr;
 skimr.init();
 })(window);
