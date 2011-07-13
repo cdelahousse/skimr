@@ -1,12 +1,12 @@
-﻿fix full height html overlay
-
-preload next feeds entries
+﻿create loading animation for 'next' button
 
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
-Create skimr object and throw all properties and methods into it!
-DO IT jQuery STYLE!!!. Look at respond.js in HTML boilerplate
+convert elememt build funciton to use fragments
 
+event delegation on #skimr div tag.
+
+fix full height html overlay
 
 Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object
 
@@ -44,8 +44,11 @@ FUCNTIONALITY TO ADD:
 -when user hovers on link, short description appears to the right
 
 DONE:
+preload next feeds entries
 use png transparency. Incorporate via data URI
 Add dates
 when user runs bookmarklet and he's scrolled down, scroll window up
 1redeclare undefined as undefined
 .Use 'feedlookup' feature as fallback
+make Css tag building cross browse
+Create skimr object and throw all properties and methods into it!

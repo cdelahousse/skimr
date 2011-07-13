@@ -136,6 +136,10 @@ skimr.postFeedInit = function (results) {
 	//Preload remaining for pagination
 	skimr.initFeed(num_max_entries,function (){
 		console.log(this.feed.entries.length);
+		//For some reason, when sending this fucntion as a callback,
+		//the returned results object is 'this'. The old results object
+		//is still return. There are now two result objects within the
+		//scope. Weird, huh?
 		current_results = this.feed.entries;
 		 });
 }
@@ -210,11 +214,12 @@ skimr.buildGoogleTag = function (){
 
 //Create loading div element
 skimr.buildLoadingDiv =	function (){
-	var div = document.createElement('div'),
-		style_attributes;
+	var div = document.createElement('div');
 
-	div.setAttribute('id','skimr-loading');
-	div.innerHTML = 'Loading...';
+	div.id = 'skimr-loading';
+	(div.innerContent) ?
+		div.innerContent = 'Loading...' : //W3C  
+		div.innerText = 'Loading...'; //IE (ewwww)
 
 	return div;
 }
@@ -260,23 +265,25 @@ skimr.buildCss = function () {
 
 
 	css_tag = document.createElement('style'); 
-	css_tag.setAttribute('type', 'text/css'); 
+	//css_tag.type = 'text/css';
+	
 
-	css = document.createTextNode(css); 
-	css_tag.appendChild(css);
-
+	try {
+		css_tag.appendChild(document.createTextNode(css) ); //W3C
+	} catch (e) {
+		if (css_tag.styleSheet) { //IE. Ew.
+			css_tag.styleSheet.cssText =  css;
+		}
+	}
 	return css_tag;
 }
 
 skimr.buildSkimrDiv = function (){
-	var div = document.createElement('div'),
-		style_attributes;//XXX Is style_attributes needed?
-
-	div.setAttribute('id','skimr');
-
+	var div = document.createElement('div');
+	div.id = 'skimr';
 	return div;
-
 }
+
 skimr.buildListDiv = function (offset) {
 	var ul,
 			entry,
@@ -320,7 +327,6 @@ skimr.buildListDiv = function (offset) {
 
 		ul.appendChild(li); 
 	}
-	console.log(ul);
 	return ul;
 }
 
