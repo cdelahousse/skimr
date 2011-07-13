@@ -4,8 +4,6 @@ bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
 fix in firefox
 
-event delegation on #skimr div tag.
-
 fix full height html overlay
 
 
@@ -13,9 +11,6 @@ Create private var for document.getElementByID. var this.ID = document.getElemen
 
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
 
-Convert next, exit and previous button to event deleagetion
-
-move date to right of title
 
 convert date to simpler (dd/mm/yyy)
 
@@ -38,8 +33,6 @@ Add quick resume of article beneath title link. This could eventually be a funct
 
 If can't find feed, warn user: this means modifying getFeedURL and goog Feed lookup fallback to return false if nothing's found.
 
-if both atom and RSS feed are shown but Atom feed appears first, to still take RSS feed
-
 FUCNTIONALITY TO ADD:
 -divide skmir window in two. The first thing to appear on right screen is how to use skimr
 -when user hovers on link, short description appears to the right
@@ -54,3 +47,4 @@ when user runs bookmarklet and he's scrolled down, scroll window up
 make Css tag building cross browse
 Create skimr object and throw all properties and methods into it!
 Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object  -- Not NEEDED
+move date to right of title

@@ -25,7 +25,9 @@ var skimr = {},
 		num_max_entries = 250, //Google feed API maxes out at 250
 		rss_url,
 		current_offset = 0,
-		current_results = null;
+		current_results = null,
+		current_results_length = 0;
+
 
 //Initilisation
 skimr.init = function () {
@@ -129,7 +131,11 @@ skimr.postFeedInit = function (results) {
 	//Once the feed is initialissed, no need for loading msg
 	loading_div.parentNode.removeChild(loading_div);
 
-	entries = current_results = results.feed.entries; 
+	//entries = current_results = results.feed.entries; //XXX Do I need the entries var?
+	
+	//Update class properties
+	current_results = results.feed.entries; 
+	current_results_length = current_results.length;
 
 	//Element that houses feed links
 	list_div = skimr.buildListDiv();
@@ -138,22 +144,29 @@ skimr.postFeedInit = function (results) {
 
 	//Preload remaining for pagination
 	skimr.initFeed(num_max_entries,function (){
-		console.log(this.feed.entries.length);
 		//For some reason, when sending this fucntion as a callback,
 		//the returned results object is 'this'. The old results object
 		//is still return. There are now two result objects within the
 		//scope. Weird, huh?
 		current_results = this.feed.entries;
+		current_results_length = current_results.length;
+		//Allow Pagination
+		next_anchor.className = 'show'; //class show selector doesn't exit, it's just there for clarity
 		 });
 }
 
 
 skimr.pagination = function(offset) {
+
+	current_offset += offset;
+
+	next_anchor.className = offset >= (current_results_length - current_offset) ? 'hide': 'show';
+	prev_anchor.className = current_offset >= 0 ? 'show' : 'hide';
+
 	list_div.parentNode.removeChild(list_div);
-	//Element that houses feed links
-	list_div = skimr.buildListDiv(offset);
-	//Append to main element
+	list_div = skimr.buildListDiv(offset); //Rebuild link list
 	skimr_div.appendChild(list_div);
+	
 }
 
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
@@ -189,9 +202,7 @@ skimr.getRSSLink = function () {
 		}
 	}
 
-	return rss_link || googleFeedLookup(location);
-	
-	//return rss_link;
+	return rss_link || googleFeedLookup(location); //google feed lookup as backup
 }
 
 skimr.googleFeedLookup = function (url){
@@ -208,10 +219,8 @@ skimr.googleFeedLookup = function (url){
 
 //builds that tag that will load the google api
 skimr.buildGoogleTag = function (){ 
-	var google_tag;
-	google_tag = document.createElement('script');
+	var google_tag = document.createElement('script');
 	google_tag.src = 'https://www.google.com/jsapi';
-	google_tag.setAttribute('type','text/javascript');
 	return google_tag;
 }
 
@@ -234,7 +243,7 @@ skimr.buildCss = function () {
 
 		css = 
 			//RESETS		
-		'html \{position: relative;\}\n'//For full page veil
+		'html \{position: absolute; top:0; bottom:0;\}\n'//For full page veil
 
 		+ 'html,body \{width: 100% !important; padding: 0 !important; '
 			+ 'min-width: 100% !important; margin: 0 !important; '
@@ -258,18 +267,17 @@ skimr.buildCss = function () {
 
 		+ '#skimr-dashboard a \{color: #444;\}'
 
+		+ '#skimr-dashboard .hide \{visibility: hidden;\}'
+
 		+ '#skimr-list \{background-color: #efefef; width: 50%; margin: 0 auto; '
 			+ 'text-align: left; \}\n' 
 
 		+ '#skimr-list li \{ border-bottom: 1px dashed #aaa;\}'
 
-		+ '#skimr-list a \{display:block; color: #444;  '
-			+ ' font-weight: normal;\}\n';//cont'd
+		+ '#skimr-list a \{color: #444;  font-weight: normal;\}\n';//cont'd
 
 
 	css_tag = document.createElement('style'); 
-	//css_tag.type = 'text/css';
-	
 
 	try {
 		css_tag.appendChild(document.createTextNode(css) ); //W3C
@@ -295,19 +303,25 @@ skimr.buildListDiv = function (offset) {
 			li,
 			span,
 			pub_date,
-			entries;
+			entries,
+			end;
 	
 	ul = document.createElement('ul');
-
 	ul.id = 'skimr-list';
 
-	offset = offset || 0; // If offset given, the work with that, if not, default 0
-	
+	offset = offset || entries_per_page; // If no offset given, default entries per page
 	entries = current_results;
 
+	end = ((current_offset + offset) > current_results_length) ? // if desired offset will be more than results
+		current_results_length : //Just do remaining items
+		current_offset + Math.abs(offset); 
+
+	//console.log('current_off: ',current_offset); //xxx
+	//console.log('offset: ', offset); //xxx
+	//console.log(current_offset, ', end: ',  end) //xxx
+
 	//Creates anchor tags, adds hypertext reference
-	var n = entries.length; //XXX Is this variable needed?
-	for (var i = offset; i < n; i++) { //TODO Convert loop to decrement to zero
+	for (var i = current_offset; i < end; i++) { 
 		entry = entries[i];
 
 		li = document.createElement('li'); 
@@ -316,7 +330,7 @@ skimr.buildListDiv = function (offset) {
 		a.setAttribute('href', entry.link);
 		
 		title_text = entry.title;	
-		title = document.createTextNode(title_text);
+		title = document.createTextNode( (i + 1) + ') ' + title_text);
 		a.appendChild(title); 
 		
 		span = document.createElement('span');
@@ -334,41 +348,42 @@ skimr.buildListDiv = function (offset) {
 }
 
 skimr.buildDashboard = function () {
-	var dashboard_div;
+	var dashboard_div,
+			anchor;
 
 	//TODO Add document = document; //moves document global in to a local variable for performance
 
 	dashboard_div = document.createElement('div'); 
 	dashboard_div.id = 'skimr-dashboard';
 	
-	exit_anchor = document.createElement('a');
+	anchor = document.createElement('a');
+	anchor.href = '#';
+
+	exit_anchor = anchor.cloneNode(false);
 	exit_anchor.id = 'skimr-exit';
 	exit_anchor.appendChild(document.createTextNode('Exit'));
 
-	//TODO CONVERT THIS TO EVENT DELEGATAION
-	exit_anchor.onmouseover = function(){
-		exit_anchor.style.cursor = 'pointer'
-	};
-	exit_anchor.onmouseout = function(){
-		exit_anchor.style.cursor='default'
-	};
-	exit_anchor.onclick = skimr.exitApp;
-
-	next_anchor = document.createElement('a');
+	next_anchor =  anchor.cloneNode(false);
+	next_anchor.className = 'hide'; //Default off until more feed items load
 	next_anchor.id = 'skimr-next';
 	next_anchor.appendChild(document.createTextNode('Next'));
 
-	next_anchor.onmouseover = function(){
-		next_anchor.style.cursor = 'pointer'
-	};
-	next_anchor.onmouseout = function(){
-		next_anchor.style.cursor='default'
-	};
+	prev_anchor =  anchor.cloneNode(false);
+	prev_anchor.className = 'hide';
+	prev_anchor.id = 'skimr-next';
+	prev_anchor.appendChild(document.createTextNode('Prev'));
+
+	exit_anchor.onclick = skimr.exitApp;
+
 	next_anchor.onclick = function () {
-		current_offset += entries_per_page;
-		skimr.pagination(current_offset);
+		skimr.pagination(entries_per_page);
 	}
 
+	prev_anchor.onclick = function () {
+		skimr.pagination(-entries_per_page);
+	}
+
+	dashboard_div.appendChild(prev_anchor);
 	dashboard_div.appendChild(exit_anchor);
 	dashboard_div.appendChild(next_anchor);
 
