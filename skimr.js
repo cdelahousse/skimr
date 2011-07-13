@@ -296,7 +296,7 @@ skimr.buildListDiv = function (offset) {
 	
 	ul = document.createElement('ul');
 
-	ul.setAttribute('id', 'skimr-list');
+	ul.id = 'skimr-list';
 
 	offset = offset || 0; // If offset given, the work with that, if not, default 0
 	
@@ -337,10 +337,10 @@ skimr.buildDashboard = function () {
 	//TODO Add document = document; //moves document global in to a local variable for performance
 
 	dashboard_div = document.createElement('div'); 
-	dashboard_div.setAttribute('id','skimr-dashboard');
+	dashboard_div.id = 'skimr-dashboard';
 	
 	exit_anchor = document.createElement('a');
-	exit_anchor.setAttribute('id', 'skimr-exit');
+	exit_anchor.id = 'skimr-exit';
 	exit_anchor.appendChild(document.createTextNode('Exit'));
 
 	//TODO CONVERT THIS TO EVENT DELEGATAION
@@ -353,7 +353,7 @@ skimr.buildDashboard = function () {
 	exit_anchor.onclick = skimr.exitApp;
 
 	next_anchor = document.createElement('a');
-	next_anchor.setAttribute('id','skimr-next');
+	next_anchor.id = 'skimr-next';
 	next_anchor.appendChild(document.createTextNode('Next'));
 
 	next_anchor.onmouseover = function(){
