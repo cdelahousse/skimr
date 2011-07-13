@@ -2,13 +2,12 @@
 
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
-convert elememt build funciton to use fragments
+fix in firefox
 
 event delegation on #skimr div tag.
 
 fix full height html overlay
 
-Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object
 
 Create private var for document.getElementByID. var this.ID = document.getElementByID. Invoke by ID('skimr'); 
 
@@ -19,6 +18,8 @@ Convert next, exit and previous button to event deleagetion
 move date to right of title
 
 convert date to simpler (dd/mm/yyy)
+
+convert elememt build funciton to use fragments
 
 Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script (head?) tag
 
@@ -52,3 +53,4 @@ when user runs bookmarklet and he's scrolled down, scroll window up
 .Use 'feedlookup' feature as fallback
 make Css tag building cross browse
 Create skimr object and throw all properties and methods into it!
+Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object  -- Not NEEDED

@@ -11,7 +11,6 @@
 
 <section id="main-content" role="main">
   <h1>Skimr</h1>
-  <article>
 
   <a href="javascript: (function(){function c(){var b=document.createElement('script');b.setAttribute('type','text/javascript');b.src='http://localhost/js/skimr/skimr.js';document.getElementsByTagName('head')[0].appendChild(b)}var a;a=document.createElement('script');a.src='https://www.google.com/jsapi';a.setAttribute('type','text/javascript');document.getElementsByTagName('head')[0].appendChild(a);if(a.readyState)a.onreadystatechange=function(){if(a.readyState=='loaded'||a.readyState=='complete'){a.onreadystatechange=
 null;c()}};else a.onload=function(){c()}})(); ">Run</a>
@@ -19,15 +18,13 @@ null;c()}};else a.onload=function(){c()}})(); ">Run</a>
 
 <script> 
 	(function(){
-		var	my_script_tag = document.createElement('script');
-		my_script_tag.setAttribute('type','text/javascript');
-		my_script_tag.src ='http://localhost/js/skimr/skimr.js';
-		document.getElementsByTagName('head')[0].appendChild(my_script_tag); 
+		window.skimr_script = document.createElement('script');
+		skimr_script.src ='http://localhost/js/skimr/skimr.js';
+		(document.head || document.body).appendChild(skimr_script); 
 	}());
 </script>
 
 
-  </article>
 </section>
 </body>
 </html>

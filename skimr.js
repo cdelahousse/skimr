@@ -16,6 +16,9 @@ var skimr = {},
 		loading_div,
 		list_div,
 		dashboard_div,
+		exit_anchor,
+		next_anchor,
+		prev_anchor,
 
 //Private Properties
 		entries_per_page = 50,  //Entries per page
@@ -331,9 +334,8 @@ skimr.buildListDiv = function (offset) {
 }
 
 skimr.buildDashboard = function () {
-	var dashboard_div,
-			exit_anchor,
-			next_anchor;
+	var dashboard_div;
+
 	//TODO Add document = document; //moves document global in to a local variable for performance
 
 	dashboard_div = document.createElement('div'); 
@@ -377,10 +379,13 @@ skimr.exitApp = function () {
 	skimr_div.parentNode.removeChild( skimr_div ); 
 	css_tag.parentNode.removeChild( css_tag );
 	google_tag.parentNode.removeChild( google_tag );
+	skimr_script.parentNode.removeChild( skimr_script);
 	//XXX can we delete the nodes using the delete keyword?
 	
 	//Delete global object;
-	delete skimr;
+	delete window.skimr;
+	
+	delete window.skimr_script;
 
 //todo Delete script tag	
 	//var script_tagsdocument.getElementsByTagName('head')[0].findElementsByTagName('script');
