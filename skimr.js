@@ -9,7 +9,7 @@ var skimr = {},
 // Google object
 		google,
 
-//Created document elements
+//Created document and UI elements
 		google_tag,
 		css_tag,
 		skimr_div,//container div
@@ -102,7 +102,6 @@ skimr.initFeed = function (num,callback) {
 	//Default to postFeedInit
 	callback = callback || skimr.postFeedInit;
 
-	//TODO: if Google_Feed doesn't load, exit app with warning to the user
 	google_feed = new google.feeds.Feed(rss_url);
 	
 	//Initialise feed settings
@@ -121,9 +120,10 @@ skimr.postFeedInit = function (results) {
 	
 
 	//TODO WE NEED TO IMPLEMENT PROPER ERROR HANDLING
+	//TODO If we do implement error handling, move to program code, not methods. I think...
 	// If feed doesn't load or doesn't exist, exit app
 	if (results.status.code === 400){
-		alert('Woops, there\'s a problem. I\'ll fix it soon... '); //TODO Replace wth proper error handling
+		alert('Woops, there\'s a problem. I\'ll fix it soon... '); 
 		skimr.exitApp();
 		//throw 'Feed 404';// TODO MUST CATCH
 	}
@@ -131,7 +131,6 @@ skimr.postFeedInit = function (results) {
 	//Once the feed is initialissed, no need for loading msg
 	loading_div.parentNode.removeChild(loading_div);
 
-	//entries = current_results = results.feed.entries; //XXX Do I need the entries var?
 	
 	//Update class properties
 	current_results = results.feed.entries; 
@@ -141,6 +140,9 @@ skimr.postFeedInit = function (results) {
 	list_div = skimr.buildListDiv();
 	//Append to main element
 	skimr_div.appendChild(list_div);
+
+	//Set events to UI
+	skimr.eventDelegation(skimr_div);
 
 	//Preload remaining for pagination
 	skimr.initFeed(num_max_entries,function (){
@@ -161,12 +163,34 @@ skimr.pagination = function(offset) {
 	current_offset += offset;
 
 	next_anchor.className = offset >= (current_results_length - current_offset) ? 'hide': 'show';
-	prev_anchor.className = current_offset >= 0 ? 'show' : 'hide';
+	prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
 
 	list_div.parentNode.removeChild(list_div);
 	list_div = skimr.buildListDiv(offset); //Rebuild link list
 	skimr_div.appendChild(list_div);
 	
+}
+
+//Attaches events to UI
+skimr.eventDelegation = function (elem) {
+	elem.onclick = function (event){
+		var target;
+		event = event || window.event; //For IE. Ew...
+		target = event.target || event.src; //W3C || IE. Ewy.. Gross...  
+
+		switch (target.id) {
+			case 'skimr-exit':
+			skimr.exitApp();
+			break;
+			case 'skimr-next':
+			skimr.pagination(entries_per_page);
+			break;
+			case 'skimr-prev':
+			skimr.pagination(-entries_per_page);
+			break;
+
+		}
+	}
 }
 
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
@@ -351,8 +375,6 @@ skimr.buildDashboard = function () {
 	var dashboard_div,
 			anchor;
 
-	//TODO Add document = document; //moves document global in to a local variable for performance
-
 	dashboard_div = document.createElement('div'); 
 	dashboard_div.id = 'skimr-dashboard';
 	
@@ -370,18 +392,8 @@ skimr.buildDashboard = function () {
 
 	prev_anchor =  anchor.cloneNode(false);
 	prev_anchor.className = 'hide';
-	prev_anchor.id = 'skimr-next';
+	prev_anchor.id = 'skimr-prev';
 	prev_anchor.appendChild(document.createTextNode('Prev'));
-
-	exit_anchor.onclick = skimr.exitApp;
-
-	next_anchor.onclick = function () {
-		skimr.pagination(entries_per_page);
-	}
-
-	prev_anchor.onclick = function () {
-		skimr.pagination(-entries_per_page);
-	}
 
 	dashboard_div.appendChild(prev_anchor);
 	dashboard_div.appendChild(exit_anchor);
@@ -400,14 +412,8 @@ skimr.exitApp = function () {
 	//Delete global object;
 	delete window.skimr;
 	
-	delete window.skimr_script;
+	delete window.skimr_script; 
 
-//todo Delete script tag	
-	//var script_tagsdocument.getElementsByTagName('head')[0].findElementsByTagName('script');
-	//	for loop
-	
-	//Delete this object
-	//delete this;
 }
 
 //Expose skimr to the global namespace

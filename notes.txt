@@ -39,6 +39,7 @@ FUCNTIONALITY TO ADD:
 
 DONE:
 preload next feeds entries
+added event delegation
 use png transparency. Incorporate via data URI
 Add dates
 when user runs bookmarklet and he's scrolled down, scroll window up
