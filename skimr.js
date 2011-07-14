@@ -372,48 +372,50 @@ skimr.buildListDiv = function (offset) {
 }
 
 skimr.buildDashboard = function () {
-	var dashboard_div,
-			anchor;
+	var dashboard_div;
 
 	dashboard_div = document.createElement('div'); 
 	dashboard_div.id = 'skimr-dashboard';
 	
-	anchor = document.createElement('a');
-	anchor.href = '#';
-
-	exit_anchor = anchor.cloneNode(false);
-	exit_anchor.id = 'skimr-exit';
-	exit_anchor.appendChild(document.createTextNode('Exit'));
-
-	next_anchor =  anchor.cloneNode(false);
-	next_anchor.className = 'hide'; //Default off until more feed items load
-	next_anchor.id = 'skimr-next';
-	next_anchor.appendChild(document.createTextNode('Next'));
-
-	prev_anchor =  anchor.cloneNode(false);
-	prev_anchor.className = 'hide';
-	prev_anchor.id = 'skimr-prev';
-	prev_anchor.appendChild(document.createTextNode('Prev'));
+	exit_anchor = buildAnchor('Exit','skimr-exit'); 
+	//Default: hide class while preloading the next google feed results 
+	next_anchor = buildAnchor('Next','skimr-next','hide');
+	prev_anchor = buildAnchor('Prev','skimr-prev','hide');
 
 	dashboard_div.appendChild(prev_anchor);
 	dashboard_div.appendChild(exit_anchor);
 	dashboard_div.appendChild(next_anchor);
 
 	return dashboard_div; 
+
+	//Helper function
+	function buildAnchor (title,id,className) {
+		var anchor = document.createElement('a');
+		anchor.href = '#';
+		anchor.appendChild(document.createTextNode(title));
+		if (id) anchor.id = id;
+		if (className) anchor.className = className;
+		return anchor;
+	}
+
 }
 
 skimr.exitApp = function () {
-	skimr_div.parentNode.removeChild( skimr_div ); 
-	css_tag.parentNode.removeChild( css_tag );
-	google_tag.parentNode.removeChild( google_tag );
-	skimr_script.parentNode.removeChild( skimr_script);
-	//XXX can we delete the nodes using the delete keyword?
-	
+
+	remNode(skimr_div);
+	remNode(css_tag);
+	remNode(google_tag);
+	remNode(window.skimr_script);
+
 	//Delete global object;
 	delete window.skimr;
 	
 	delete window.skimr_script; 
 
+	//Helper function
+	function remNode(elem){
+		return elem.parentNode.removeChild(elem);
+	}
 }
 
 //Expose skimr to the global namespace

@@ -1,4 +1,7 @@
-﻿create loading animation for 'next' button
+﻿use DocumentFragments in program code while building UI
+lookup performance using document fragments
+
+create loading animation for 'next' button
 
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
@@ -6,11 +9,7 @@ fix in firefox
 
 fix full height html overlay
 
-
-Create private var for document.getElementByID. var this.ID = document.getElementByID. Invoke by ID('skimr'); 
-
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
-
 
 convert date to simpler (dd/mm/yyy)
 
