@@ -1,6 +1,9 @@
 ﻿use DocumentFragments in program code while building UI
 lookup performance using document fragments
 
+conver buildListDiv() to use innerHTML. It's much faster
+
+
 create loading animation for 'next' button
 
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds

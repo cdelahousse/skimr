@@ -414,7 +414,7 @@ skimr.exitApp = function () {
 
 	//Helper function
 	function remNode(elem){
-		return elem.parentNode.removeChild(elem);
+		return elem ? elem.parentNode.removeChild(elem) : false ;
 	}
 }
 
