@@ -14,7 +14,7 @@ var skimr = {},
 		css_tag,
 		skimr_div,//container div
 		loading_div,
-		list_div,
+		list_table,
 		dashboard_div,
 		exit_anchor,
 		next_anchor,
@@ -30,32 +30,29 @@ var skimr = {},
 
 
 //Initilisation
-skimr.init = function () {
+function init () {
 
-	var body = document.body;
+	var fragment = document.createDocumentFragment();
 
-	rss_url = skimr.getRSSLink(); //Find RSS URL
+	rss_url = getRSSLink(); //Find RSS URL
 	//TODO: if getRSSLink fails, exit app with warning to the user
 
-	google_tag = skimr.buildGoogleTag();
+	google_tag = buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
-
-	//Add CSS style tag 
-	css_tag = skimr.buildCss();
-	body.appendChild( css_tag );
-
-	skimr_div = skimr.buildSkimrDiv();
-	body.appendChild( skimr_div );
-
+	
 	//Scroll to top
 	window.scroll(0,0);
+	
+	skimr_div = buildSkimrDiv();
+	css_tag = buildCss(); 	//Add CSS style tag 
+	loading_div = buildLoadingDiv(); //Add loading message to body tag
+	dashboard_div = buildDashboard();
 
-	//Add loading message to body tag
-	loading_div = skimr.buildLoadingDiv();
 	skimr_div.appendChild( loading_div );
-
-	dashboard_div = skimr.buildDashboard();
 	skimr_div.appendChild(dashboard_div);
+	fragment.appendChild( css_tag );
+	fragment.appendChild( skimr_div );
+	document.body.appendChild(fragment);
 
 	//the Google JS API is weird and takes a while to load,
 	//so we need to be sure to load it completely before we continue, hence the onload.
@@ -64,58 +61,56 @@ skimr.init = function () {
 		google_tag.onreadystatechange = function(){
 		if (google_tag.readyState == "loaded" || google_tag.readyState == "complete"){
 				google_tag.onreadystatechange = null;
-				skimr.loadFeedAPI();
+				loadFeedAPI();
 			}
 		};
 	} else {  //Other browsers, the decent and good ones (not IE)
 		google_tag.onload = function(){
-			skimr.loadFeedAPI();
-		}; 
+			loadFeedAPI();
+		};
 	}
-	
 }
 
 //PART 2
 //Loads the Google Feeds API
-skimr.loadFeedAPI = function() {
+function loadFeedAPI () {
 
 	//Move google loader object into local scope
 	google = window.google;
 
 	google.load('feeds', '1', {
-		"callback": skimr.initFeed, //Once the feed api is loaded, it calls initFeed() 
+		"callback": initFeed, //Once the feed api is loaded, it calls initFeed() 
 		"nocss": true
 		});
+
 }
 
 
 // (re)initalise the feed
-skimr.initFeed = function (num,callback) {
-
+function initFeed (num,callback) {
 	var google_feed; //Google Feed object
 
 	//Number of entries to request
 	//Default to default entries per page if none specified, the number used for first page
-	num = num || entries_per_page; 
+	num || (num = entries_per_page); //Faster http://jsperf.com/conditional-assignment 
 
 	//Callback to be called once feed has been received by GoogFeedAPI
 	//Default to postFeedInit
-	callback = callback || skimr.postFeedInit;
-
-	google_feed = new google.feeds.Feed(rss_url);
+	callback || (callback = postFeedInit);
+	google_feed = new window.google.feeds.Feed(rss_url);
 	
 	//Initialise feed settings
 	google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
 	google_feed.includeHistoricalEntries();
 	google_feed.setNumEntries(num);
 
-	//Once feed is loaded, callback funtion. Default: PostFeedInit
+	//Once feed is loaded, callback funtion. Default: postFeedInit
 	google_feed.load(callback);
 }
 
 //What to do once feed has been initialised
 //var results is passed for the google feed api (see initFeed)
-skimr.postFeedInit = function (results) {
+function postFeedInit (results) {
 	var entries;
 	
 
@@ -123,29 +118,29 @@ skimr.postFeedInit = function (results) {
 	//TODO If we do implement error handling, move to program code, not methods. I think...
 	// If feed doesn't load or doesn't exist, exit app
 	if (results.status.code === 400){
-		alert('Woops, there\'s a problem. I\'ll fix it soon... '); 
-		skimr.exitApp();
+		alert('Woops, there is a problem with the feed'); 
+		exitApp();
 		//throw 'Feed 404';// TODO MUST CATCH
 	}
 	
 	//Once the feed is initialissed, no need for loading msg
-	loading_div.parentNode.removeChild(loading_div);
+	remNode(loading_div);
 
 	
-	//Update class properties
+	//Update skimr class properties
 	current_results = results.feed.entries; 
 	current_results_length = current_results.length;
 
 	//Element that houses feed links
-	list_div = skimr.buildListDiv();
+	list_table = buildListTable();
 	//Append to main element
-	skimr_div.appendChild(list_div);
+	skimr_div.appendChild(list_table);
 
 	//Set events to UI
-	skimr.eventDelegation(skimr_div);
+	eventDelegation(skimr_div);
 
 	//Preload remaining for pagination
-	skimr.initFeed(num_max_entries,function (){
+	initFeed(num_max_entries,function (){
 		//For some reason, when sending this fucntion as a callback,
 		//the returned results object is 'this'. The old results object
 		//is still return. There are now two result objects within the
@@ -158,35 +153,35 @@ skimr.postFeedInit = function (results) {
 }
 
 
-skimr.pagination = function(offset) {
+function pagination (offset) {
 
 	current_offset += offset;
 
 	next_anchor.className = offset >= (current_results_length - current_offset) ? 'hide': 'show';
 	prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
 
-	list_div.parentNode.removeChild(list_div);
-	list_div = skimr.buildListDiv(offset); //Rebuild link list
-	skimr_div.appendChild(list_div);
+	remNode(list_table);
+	list_table = buildListDiv(offset); //Rebuild link list
+	skimr_div.appendChild(list_table);
 	
 }
 
 //Attaches events to UI
-skimr.eventDelegation = function (elem) {
+function eventDelegation (elem) {
 	elem.onclick = function (event){
 		var target;
-		event = event || window.event; //For IE. Ew...
-		target = event.target || event.src; //W3C || IE. Ewy.. Gross...  
+		event || (event = window.event); //For IE. Ew...
+		event.target || (target = event.src); //W3C || IE. Ewy.. Gross...  
 
 		switch (target.id) {
 			case 'skimr-exit':
-			skimr.exitApp();
+			exitApp();
 			break;
 			case 'skimr-next':
-			skimr.pagination(entries_per_page);
+			pagination(entries_per_page);
 			break;
 			case 'skimr-prev':
-			skimr.pagination(-entries_per_page);
+			pagination(-entries_per_page);
 			break;
 
 		}
@@ -195,7 +190,7 @@ skimr.eventDelegation = function (elem) {
 
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
 //the hypertext reference. If none, returns false
-skimr.getRSSLink = function () {
+function getRSSLink () {
 	var	link_nodes = document.getElementsByTagName('link'),
 			location = window.location, //local version of location object
 			rss_link = false, //false until proven found. Initialised as not found
@@ -229,7 +224,7 @@ skimr.getRSSLink = function () {
 	return rss_link || googleFeedLookup(location); //google feed lookup as backup
 }
 
-skimr.googleFeedLookup = function (url){
+function googleFeedLookup (url){
 	if (!google.feeds.lookupFeed) {
 		console.log('Google Feed Lookup not loaded');
 		return false;
@@ -242,14 +237,14 @@ skimr.googleFeedLookup = function (url){
 }
 
 //builds that tag that will load the google api
-skimr.buildGoogleTag = function (){ 
+buildGoogleTag = function (){ 
 	var google_tag = document.createElement('script');
 	google_tag.src = 'https://www.google.com/jsapi';
 	return google_tag;
 }
 
 //Create loading div element
-skimr.buildLoadingDiv =	function (){
+function buildLoadingDiv (){
 	var div = document.createElement('div');
 
 	div.id = 'skimr-loading';
@@ -260,10 +255,9 @@ skimr.buildLoadingDiv =	function (){
 	return div;
 }
 
-skimr.buildCss = function () {
+function buildCss () {
 	var css,
-		css_tag;
-
+			css_tag;
 
 		css = 
 			//RESETS		
@@ -293,12 +287,10 @@ skimr.buildCss = function () {
 
 		+ '#skimr-dashboard .hide \{visibility: hidden;\}'
 
-		+ '#skimr-list \{background-color: #efefef; width: 50%; margin: 0 auto; '
+		+ '#skimr-table \{background-color: #efefef; width: 50%; margin: 0 auto; '
 			+ 'text-align: left; \}\n' 
 
-		+ '#skimr-list li \{ border-bottom: 1px dashed #aaa;\}'
-
-		+ '#skimr-list a \{color: #444;  font-weight: normal;\}\n';//cont'd
+		+ '#skimr-table a \{color: #444;  font-weight: normal;\}\n';//cont'd
 
 
 	css_tag = document.createElement('style'); 
@@ -313,16 +305,16 @@ skimr.buildCss = function () {
 	return css_tag;
 }
 
-skimr.buildSkimrDiv = function (){
+function buildSkimrDiv (){
 	var div = document.createElement('div');
 	div.id = 'skimr';
 	return div;
 }
 
-skimr.buildListDiv = function (offset) {
-	var fragment,
-			ul = document.createElement('ul'),
-			list = "",
+function buildListTable (offset) {
+	var fragment = document.createDocumentFragment(),
+			table = document.createElement('table'),
+			table_contents = "",
 			pub_date,
 			entries,
 			end,
@@ -330,9 +322,10 @@ skimr.buildListDiv = function (offset) {
 			mm,
 			dd;
 	
-	ul.id = 'skimr-list';
+	fragment.appendChild(table);
+	table.id = 'skimr-table';
 
-	offset = offset || entries_per_page; // If no offset given, default entries per page
+	offset || (offset = entries_per_page); // If no offset given, default entries per page
 	entries = current_results;
 
 	end = ((current_offset + offset) > current_results_length) ? // if desired offset will be more than results
@@ -356,17 +349,17 @@ skimr.buildListDiv = function (offset) {
 		dd = (pub_date.getDate() + 1).toString(10);
 		dd = dd.length == 1 ? "0" + dd : dd; //padding zero to day
 		
-		//list += (i + 1) + ') '; //XXX For Testing
-		list += '<li>' +  yy + '/' + mm + '/' + dd + ': '; 
-		list += '<a href="' + entry.link + '"> ' + entry.title + '</a>';
-		list += '</li>\n';
+		table_contents += '<tr><td>' +  yy + '/' + mm + '/' + dd + '</td> ' + 
+			'<td><a href="' + entry.link + '"> ' + entry.title + '</a></td></tr>\n';
 	}
 
-	ul.innerHTML = list;
-	return document.createDocumentFragment().appendChild(ul);
+	table.innerHTML = '<tr><td>YY/MM/DD</strong></td>' +
+			'<td><strong>TITLE</strong></td></tr>\n' + table_contents;
+
+	return fragment;
 }
 
-skimr.buildDashboard = function () {
+function buildDashboard () {
 	var fragment = document.createDocumentFragment(),
 			dashboard_div = document.createElement('div');
 
@@ -382,11 +375,11 @@ skimr.buildDashboard = function () {
 	dashboard_div.appendChild(exit_anchor);
 	dashboard_div.appendChild(next_anchor);
 
-	return dashboard_div; 
+	return fragment; 
 
 }
 
-skimr.exitApp = function () {
+function exitApp () {
 
 	remNode(skimr_div);
 	remNode(css_tag);
@@ -417,7 +410,13 @@ function buildAnchor (title,id,className) {
 	return anchor;
 }
 
-//Expose skimr to the global namespace
-window.skimr = skimr;
-skimr.init();
+//Expose skimr methods to the global namespace
+window.skimr = {
+	exitApp : exitApp,
+	init:	init,
+	pagination: pagination,
+}
+//INIT
+init();
+
 })(window);
