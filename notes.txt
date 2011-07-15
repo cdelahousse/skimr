@@ -1,4 +1,8 @@
-﻿use DocumentFragments in program code while building UI
+﻿add end and beginning anchors
+
+if initial amount of entries smaller than entries per page, hide next button and avoid preload
+
+use DocumentFragments in program code while building UI
 lookup performance using document fragments
 
 conver buildListDiv() to use innerHTML. It's much faster
@@ -14,7 +18,7 @@ fix full height html overlay
 
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
 
-convert date to simpler (dd/mm/yyy)
+convert date to simpler (dd/mm/yyy). Move to left of link title
 
 convert elememt build funciton to use fragments
 

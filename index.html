@@ -12,11 +12,16 @@
 <section id="main-content" role="main">
   <h1>Skimr</h1>
 
-  <a href="javascript: (function(){window.skimr_script=document.createElement('script');skimr_script.src='http://localhost/js/skimr/skimr.js';(document.head||document.body).appendChild(skimr_script)})();">Run</a>
+	<a href="javascript:	(function(){ window.skimr && window.skimr.exitApp(); //delete prior skimr instance
+		window.skimr_script = document.createElement('script');
+		skimr_script.src ='http://localhost/js/skimr/skimr.js';
+		(document.head || document.body).appendChild(skimr_script); 
+	}()); ">Run</a>
 
 
 <script> 
 	(function(){
+		window.skimr && window.skimr.exitApp(); //delete prior skimr instance
 		window.skimr_script = document.createElement('script');
 		skimr_script.src ='http://localhost/js/skimr/skimr.js';
 		(document.head || document.body).appendChild(skimr_script); 

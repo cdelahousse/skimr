@@ -410,7 +410,11 @@ skimr.exitApp = function () {
 	//Delete global object;
 	delete window.skimr;
 	
+
+	//Delete script tag created by outside run script
 	delete window.skimr_script; 
+	//For outside run script test (window.skmir.exitApp)
+	return true;
 
 	//Helper function
 	function remNode(elem){
