@@ -320,17 +320,16 @@ skimr.buildSkimrDiv = function (){
 }
 
 skimr.buildListDiv = function (offset) {
-	var ul,
-			entry,
-			title_text,
-			title,
-			li,
-			span,
+	var fragment,
+			ul = document.createElement('ul'),
+			list = "",
 			pub_date,
 			entries,
-			end;
+			end,
+			yy,
+			mm,
+			dd;
 	
-	ul = document.createElement('ul');
 	ul.id = 'skimr-list';
 
 	offset = offset || entries_per_page; // If no offset given, default entries per page
@@ -344,37 +343,34 @@ skimr.buildListDiv = function (offset) {
 	//console.log('offset: ', offset); //xxx
 	//console.log(current_offset, ', end: ',  end) //xxx
 
+	
 	//Creates anchor tags, adds hypertext reference
 	for (var i = current_offset; i < end; i++) { 
 		entry = entries[i];
 
-		li = document.createElement('li'); 
-
-		a = document.createElement('a'); 
-		a.setAttribute('href', entry.link);
-		
-		title_text = entry.title;	
-		title = document.createTextNode( (i + 1) + ') ' + title_text);
-		a.appendChild(title); 
-		
-		span = document.createElement('span');
 		pub_date = new Date(entry.publishedDate);
-		pub_date = pub_date.toLocaleDateString();// TODO Convert this to dd/mm/yyyy
-		pub_date = document.createTextNode(pub_date); 
-		span.appendChild(pub_date);
 
-		li.appendChild(a);
-		li.appendChild(span);
-
-		ul.appendChild(li); 
+		yy = pub_date.getFullYear().toString(10).substring(2);
+		mm = (pub_date.getMonth() + 1).toString(10);
+		mm = mm.length == 1 ? "0" + mm : mm; //padding zero to month
+		dd = (pub_date.getDate() + 1).toString(10);
+		dd = dd.length == 1 ? "0" + dd : dd; //padding zero to day
+		
+		//list += (i + 1) + ') '; //XXX For Testing
+		list += '<li>' +  yy + '/' + mm + '/' + dd + ': '; 
+		list += '<a href="' + entry.link + '"> ' + entry.title + '</a>';
+		list += '</li>\n';
 	}
-	return ul;
+
+	ul.innerHTML = list;
+	return document.createDocumentFragment().appendChild(ul);
 }
 
 skimr.buildDashboard = function () {
-	var dashboard_div;
+	var fragment = document.createDocumentFragment(),
+			dashboard_div = document.createElement('div');
 
-	dashboard_div = document.createElement('div'); 
+	fragment.appendChild(dashboard_div);
 	dashboard_div.id = 'skimr-dashboard';
 	
 	exit_anchor = buildAnchor('Exit','skimr-exit'); 
@@ -387,16 +383,6 @@ skimr.buildDashboard = function () {
 	dashboard_div.appendChild(next_anchor);
 
 	return dashboard_div; 
-
-	//Helper function
-	function buildAnchor (title,id,className) {
-		var anchor = document.createElement('a');
-		anchor.href = '#';
-		anchor.appendChild(document.createTextNode(title));
-		if (id) anchor.id = id;
-		if (className) anchor.className = className;
-		return anchor;
-	}
 
 }
 
@@ -416,10 +402,19 @@ skimr.exitApp = function () {
 	//For outside run script test (window.skmir.exitApp)
 	return true;
 
-	//Helper function
-	function remNode(elem){
-		return elem ? elem.parentNode.removeChild(elem) : false ;
-	}
+}
+
+//Helper functions
+function remNode(elem){//If fails, returns false
+	return elem.parentNode.removeChild(elem) || false;
+}
+function buildAnchor (title,id,className) {
+	var anchor = document.createElement('a');
+	anchor.href = '#';
+	anchor.appendChild(document.createTextNode(title));
+	if (id) anchor.id = id;
+	if (className) anchor.className = className;
+	return anchor;
 }
 
 //Expose skimr to the global namespace
