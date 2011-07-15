@@ -171,7 +171,7 @@ function eventDelegation (elem) {
 	elem.onclick = function (event){
 		var target;
 		event || (event = window.event); //For IE. Ew...
-		event.target || (target = event.src); //W3C || IE. Ewy.. Gross...  
+		target = event.target || event.src; //W3C || IE. Ewy.. Gross...  
 
 		switch (target.id) {
 			case 'skimr-exit':
@@ -283,14 +283,16 @@ function buildCss () {
 		+ '#skimr-dashboard \{width: 100%; background-color: #fff; color: #ddd;' 
 			+ 'position: fixed; bottom: 0; left: 0; text-align: center; \}\n'
 
-		+ '#skimr-dashboard a \{color: #444;\}'
+		+ '#skimr-dashboard a \{color: #444; padding-left: 5px;\}'
 
 		+ '#skimr-dashboard .hide \{visibility: hidden;\}'
 
 		+ '#skimr-table \{background-color: #efefef; width: 50%; margin: 0 auto; '
 			+ 'text-align: left; \}\n' 
 
-		+ '#skimr-table a \{color: #444;  font-weight: normal;\}\n';//cont'd
+		+ '#skimr-table th \{font-weight: normal;\}\n'//cont'd
+
+		+ '#skimr-table a \{color: #444;  font-weight: normal; display: block; padding: 3px 0;\}\n';
 
 
 	css_tag = document.createElement('style'); 
@@ -353,8 +355,8 @@ function buildListTable (offset) {
 			'<td><a href="' + entry.link + '"> ' + entry.title + '</a></td></tr>\n';
 	}
 
-	table.innerHTML = '<tr><td>YY/MM/DD</strong></td>' +
-			'<td><strong>TITLE</strong></td></tr>\n' + table_contents;
+	table.innerHTML = '<tr><th>YY/MM/DD</strong></th>' +
+			'<th>TITLE</th></tr>\n' + table_contents;
 
 	return fragment;
 }
