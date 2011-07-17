@@ -139,8 +139,9 @@ function postFeedInit (results) {
 		//scope. Weird, huh?
 		current_results = this.feed.entries;
 		current_results_length = current_results.length;
-		//Allow Pagination
-		next_anchor.className = 'show'; //class show selector doesn't exit, it's just there for clarity
+
+		//Allow Pagination via next button
+		 (current_results_length > entries_per_page) && next_anchor.className = 'show'; 
 		 });
 }
 
@@ -378,32 +379,33 @@ function buildDashboard () {
 
 function exitApp () {
 
-	if (skimr_div) remNode(skimr_div);
-	if (css_tag) remNode(css_tag);
-	if (google_tag) remNode(google_tag);
-	if (window.skimr_script) remNode(window.skimr_script);
+	remNode(skimr_div);
+	remNode(css_tag);
+	remNode(google_tag);
+	remNode(window.skimr_script);
 
 	//Delete global object;
-	if (window.skimr) delete window.skimr;
+	window.skimr && (delete window.skimr);
 	
 
 	//Delete script tag created by outside run script
-	if (window.skimr_script) delete window.skimr_script; 
+	window.skimr_script && (delete window.skimr_script); 
 	//For outside run script test (window.skmir.exitApp)
 	return true;
 
 }
 
 //Helper functions
-function remNode(elem){//If fails, returns false
-	return elem.parentNode.removeChild(elem) || false;
+function remNode(elem) {//If fails, returns false
+	return elem && elem.parentNode.removeChild(elem);
 }
 function buildAnchor (title,id,className) {
-	var anchor = document.createElement('a');
+	var document = window.document,
+			anchor = document.createElement('a');
 	anchor.href = '#';
 	anchor.appendChild(document.createTextNode(title));
-	if (id) anchor.id = id;
-	if (className) anchor.className = className;
+	id && (anchor.id = id);
+	className && (anchor.className = className);
 	return anchor;
 }
 //Run fn when given asset is  loaded

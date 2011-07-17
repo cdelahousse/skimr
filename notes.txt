@@ -2,7 +2,6 @@
 
 fix table cell space
 
-if initial amount of entries smaller than entries per page, hide next button and avoid preload
 
 create loading animation for 'next' button
 
@@ -17,6 +16,8 @@ fix full height html overlay
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
 
 Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script (head?) tag
+
+add skimr hash
 
 Create throws for all errors and Catch at the end of script
 Add Error handling
@@ -57,3 +58,4 @@ lookup performance using document fragments
 fix in firefox. (3entries only);
 make work on HTML5Boilerplate.com site (no feed)
 fix table border mashable and techcrunch
+if initial amount of entries smaller than entries per page, hide next button and avoid preload
