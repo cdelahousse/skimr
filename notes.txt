@@ -1,26 +1,20 @@
 ﻿add end and beginning anchors
 
+fix table cell space
+
 if initial amount of entries smaller than entries per page, hide next button and avoid preload
-
-use DocumentFragments in program code while building UI
-lookup performance using document fragments
-
-conver buildListDiv() to use innerHTML. It's much faster
-
 
 create loading animation for 'next' button
 
 bottom bar: quit application, go to skmir hopage, next feeds, prev feeds
 
-fix in firefox
+Wait for Google feed API to load before doing google feed lookup. Fix bug
+
+convert to GetElementById for tag lookups.... Or should I? This means deleting the private vars
 
 fix full height html overlay
 
 Convert all loops into either recursions OR flip the counters to count DOWN to zero
-
-convert date to simpler (dd/mm/yyy). Move to left of link title
-
-convert elememt build funciton to use fragments
 
 Get Paul Irish insert method <scrip> but do it to body tag instead because there is no guarantee that ther ewill be a script (head?) tag
 
@@ -55,3 +49,11 @@ make Css tag building cross browse
 Create skimr object and throw all properties and methods into it!
 Assign google global as local var. Do same for google.feeds. Add these as private properties for the skimr object  -- Not NEEDED
 move date to right of title
+conver buildListDiv() to use innerHTML. It's much faster
+convert date to simpler (dd/mm/yyy). Move to left of link title
+convert elememt build funciton to use fragments
+use DocumentFragments in program code while building UI
+lookup performance using document fragments
+fix in firefox. (3entries only);
+make work on HTML5Boilerplate.com site (no feed)
+fix table border mashable and techcrunch

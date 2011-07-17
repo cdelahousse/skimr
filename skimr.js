@@ -1,13 +1,11 @@
 (function(window,undefined) {
+'use strict';
 
 //RUNTIME SCRIPT - Script body runs here and calls functions that reside lower down
 //PART 1
 
-//Skmir object
-var skimr = {},
-
 // Google object
-		google,
+var	google,
 
 //Created document and UI elements
 		google_tag,
@@ -34,61 +32,58 @@ function init () {
 
 	var fragment = document.createDocumentFragment();
 
-	rss_url = getRSSLink(); //Find RSS URL
-	//TODO: if getRSSLink fails, exit app with warning to the user
-
 	google_tag = buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
 	
+	rss_url = getRSSLink(); //Find RSS URL
+
+	//if getRSSLink fails, exit app with warning to the user
+	if (!rss_url) {
+		alert("Skimr can't work on this page");
+		exitApp();
+		return;
+	}
+	//TODO: make warning be sliding box. Unobtrusive warning;
+
 	//Scroll to top
 	window.scroll(0,0);
 	
-	skimr_div = buildSkimrDiv();
+	skimr_div = buildSkimrDiv();//Veil
+	fragment.appendChild( skimr_div );
 	css_tag = buildCss(); 	//Add CSS style tag 
 	loading_div = buildLoadingDiv(); //Add loading message to body tag
 	dashboard_div = buildDashboard();
 
 	skimr_div.appendChild( loading_div );
-	skimr_div.appendChild(dashboard_div);
-	fragment.appendChild( css_tag );
-	fragment.appendChild( skimr_div );
+	skimr_div.appendChild( dashboard_div );
+	skimr_div.appendChild( css_tag );
+
 	document.body.appendChild(fragment);
 
-	//the Google JS API is weird and takes a while to load,
-	//so we need to be sure to load it completely before we continue, hence the onload.
-	//http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
-	if (google_tag.readyState){  //IE
-		google_tag.onreadystatechange = function(){
-		if (google_tag.readyState == "loaded" || google_tag.readyState == "complete"){
-				google_tag.onreadystatechange = null;
-				loadFeedAPI();
-			}
-		};
-	} else {  //Other browsers, the decent and good ones (not IE)
-		google_tag.onload = function(){
-			loadFeedAPI();
-		};
-	}
-}
+	//Set events to UI
+	eventDelegation(skimr_div);
+	
+	//Check to see if the google tag is loaded
+	//and pass loadFeedAPI
+	assetReady(google_tag, function () {
 
-//PART 2
-//Loads the Google Feeds API
-function loadFeedAPI () {
+			//Move google loader object into local scope
+			google = window.google;
 
-	//Move google loader object into local scope
-	google = window.google;
+			google.load('feeds', '1', {
+				"callback": initFeed, //Once the feed api is loaded, it calls initFeed() 
+				"nocss": true
+				});
 
-	google.load('feeds', '1', {
-		"callback": initFeed, //Once the feed api is loaded, it calls initFeed() 
-		"nocss": true
 		});
-
 }
-
 
 // (re)initalise the feed
 function initFeed (num,callback) {
 	var google_feed; //Google Feed object
+	
+	//Bugfix: for some odd reason, in firefox, Google obj returns 3 as an argument
+	num === 3 && (num = undefined);
 
 	//Number of entries to request
 	//Default to default entries per page if none specified, the number used for first page
@@ -97,13 +92,12 @@ function initFeed (num,callback) {
 	//Callback to be called once feed has been received by GoogFeedAPI
 	//Default to postFeedInit
 	callback || (callback = postFeedInit);
-	google_feed = new window.google.feeds.Feed(rss_url);
+	google_feed = new google.feeds.Feed(rss_url);
 	
 	//Initialise feed settings
 	google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
 	google_feed.includeHistoricalEntries();
 	google_feed.setNumEntries(num);
-
 	//Once feed is loaded, callback funtion. Default: postFeedInit
 	google_feed.load(callback);
 }
@@ -136,8 +130,6 @@ function postFeedInit (results) {
 	//Append to main element
 	skimr_div.appendChild(list_table);
 
-	//Set events to UI
-	eventDelegation(skimr_div);
 
 	//Preload remaining for pagination
 	initFeed(num_max_entries,function (){
@@ -152,16 +144,14 @@ function postFeedInit (results) {
 		 });
 }
 
-
 function pagination (offset) {
 
 	current_offset += offset;
 
 	next_anchor.className = offset >= (current_results_length - current_offset) ? 'hide': 'show';
 	prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
-
-	remNode(list_table);
-	list_table = buildListDiv(offset); //Rebuild link list
+	remNode(document.getElementById('skimr-table'));
+	list_table = buildListTable(offset); //Rebuild link list
 	skimr_div.appendChild(list_table);
 	
 }
@@ -184,7 +174,7 @@ function eventDelegation (elem) {
 			pagination(-entries_per_page);
 			break;
 
-		}
+		};
 	}
 }
 
@@ -220,24 +210,22 @@ function getRSSLink () {
 			break;
 		}
 	}
-
 	return rss_link || googleFeedLookup(location); //google feed lookup as backup
 }
 
 function googleFeedLookup (url){
-	if (!google.feeds.lookupFeed) {
-		console.log('Google Feed Lookup not loaded');
-		return false;
-	}
-	return google.feeds.lookupFeed(url,function(results){
-		var feed = results.url || false;
-		console.log('Google Feed Lookup returned: ',feed)
-		return feed;
+	return assetReady(google_tag, function(){
+
+		google.feeds.lookupFeed(url,function(results){
+			var feed = results.url || false;
+			console.log('Google Feed Lookup returned: ',feed)
+			return feed;
 		});
+	});
 }
 
 //builds that tag that will load the google api
-buildGoogleTag = function (){ 
+function buildGoogleTag (){ 
 	var google_tag = document.createElement('script');
 	google_tag.src = 'https://www.google.com/jsapi';
 	return google_tag;
@@ -255,44 +243,56 @@ function buildLoadingDiv (){
 	return div;
 }
 
+function buildSkimrDiv (){ //Veil
+	var div = document.createElement('div');
+	div.id = 'skimr';
+	return div;
+}
+
 function buildCss () {
 	var css,
 			css_tag;
 
 		css = 
 			//RESETS		
-		'html \{position: absolute; top:0; bottom:0;\}\n'//For full page veil
+		'html {position: relative;}\n'//For full page veil
 
-		+ 'html,body \{width: 100% !important; padding: 0 !important; '
+		+ 'html,head,body {width: 100% !important; padding: 0 !important; '
 			+ 'min-width: 100% !important; margin: 0 !important; '
-			+ 'max-width: 100% !important; \}\n'//For full page veil
+			+ 'max-width: 100% !important; min-height: 100%;}\n'//For full page veil
 
-		+ '#skimr, #skimr * \{padding: 0; margin: 0;\}\n' // reset
+		+ '#skimr, #skimr * {padding: 0; margin: 0;color:#000; font-weight: normal;}\n' // reset
 
-		+ '#skimr \{position: absolute;top:0;left:0;min-height:100%; width:100%; '
+		+ '#skimr {position:absolute;top:0;left:0;min-height:100%;width:100%; '
 			+ 'background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAE'
 			+ 'AAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGC4DAAA2ADUwvUnWwAAAABJRU5E'
-			+ 'rkJggg==) transparent repeat; '//cont'd
-			+ 'margin: 0; z-index: 99999; font-weight: normal; '//cont'd
-			+ 'overflow: hidden; padding-bottom: 30px; '//clearfix and padding
-			+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; \}\n'//cont'd
+			+ 'rkJggg==) transparent repeat; '
+			+ 'z-index: 99999999; '
+			//+ 'overflow: auto;'//clearfix
+			+ 'padding:0 0 30px;'//For Dashbar
+			+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; }\n'//cont'd
 
-		+ '#skimr-loading \{width: 100%; background-color: #FFF; color: #000;' 
-			+ 'text-align: center;border-bottom: 1px solid #999;\}\n'//cont'd
+		+ '#skimr-loading {width: 100%; background-color: #FFF; color: #000;' 
+			+ 'text-align: center;}\n'//cont'd
 
-		+ '#skimr-dashboard \{width: 100%; background-color: #fff; color: #ddd;' 
-			+ 'position: fixed; bottom: 0; left: 0; text-align: center; \}\n'
+		+ '#skimr-dashboard {width: 100%; background-color: #fff; color: #ddd;' 
+			+ 'position: fixed; bottom: 0; left: 0; text-align: center; }\n'
 
-		+ '#skimr-dashboard a \{color: #444; padding-left: 5px;\}'
+		+ '#skimr a {text-decoration: underline;}'
 
-		+ '#skimr-dashboard .hide \{visibility: hidden;\}'
+		+ '#skimr-dashboard a {margin-left: 5px;}'
 
-		+ '#skimr-table \{background-color: #efefef; width: 50%; margin: 0 auto; '
-			+ 'text-align: left; \}\n' 
+		+ '#skimr-dashboard .hide {visibility: hidden;}'
 
-		+ '#skimr-table th \{font-weight: normal;\}\n'//cont'd
+		+ '#skimr-table {background-color: #EFEFEF; max-width: 1000px; margin: 0 auto; '
+			+ 'border:solid 5px #EFEFEF;'
+			+ '-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;'
+			+ 'margin-top:20px;'
+			+ 'text-align: left;border-collapse:separate; }\n' 
 
-		+ '#skimr-table a \{color: #444;  font-weight: normal; display: block; padding: 3px 0;\}\n';
+		+ '#skimr-table th {font-weight: normal; text-align:center;}\n'//cont'd
+
+		+ '#skimr-table a {color: #444; display: block; padding: 3px 0;}\n';
 
 
 	css_tag = document.createElement('style'); 
@@ -307,18 +307,13 @@ function buildCss () {
 	return css_tag;
 }
 
-function buildSkimrDiv (){
-	var div = document.createElement('div');
-	div.id = 'skimr';
-	return div;
-}
-
 function buildListTable (offset) {
 	var fragment = document.createDocumentFragment(),
 			table = document.createElement('table'),
 			table_contents = "",
 			pub_date,
 			entries,
+			entry,
 			end,
 			yy,
 			mm,
@@ -355,8 +350,8 @@ function buildListTable (offset) {
 			'<td><a href="' + entry.link + '"> ' + entry.title + '</a></td></tr>\n';
 	}
 
-	table.innerHTML = '<tr><th>YY/MM/DD</strong></th>' +
-			'<th>TITLE</th></tr>\n' + table_contents;
+	table.innerHTML = '<tr><th>yy/mm/dd</strong></th>' +
+			'<th id="skimr-title">Title</th></tr>\n' + table_contents;
 
 	return fragment;
 }
@@ -383,17 +378,17 @@ function buildDashboard () {
 
 function exitApp () {
 
-	remNode(skimr_div);
-	remNode(css_tag);
-	remNode(google_tag);
-	remNode(window.skimr_script);
+	if (skimr_div) remNode(skimr_div);
+	if (css_tag) remNode(css_tag);
+	if (google_tag) remNode(google_tag);
+	if (window.skimr_script) remNode(window.skimr_script);
 
 	//Delete global object;
-	delete window.skimr;
+	if (window.skimr) delete window.skimr;
 	
 
 	//Delete script tag created by outside run script
-	delete window.skimr_script; 
+	if (window.skimr_script) delete window.skimr_script; 
 	//For outside run script test (window.skmir.exitApp)
 	return true;
 
@@ -411,13 +406,33 @@ function buildAnchor (title,id,className) {
 	if (className) anchor.className = className;
 	return anchor;
 }
+//Run fn when given asset is  loaded
+function assetReady(asset,fn) {
+	//the Google JS API is weird and takes a while to load,
+	//so we need to be sure to load it completely before we continue, hence the onload.
+	//http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
+	if (asset.readyState){  //IE
+		asset.onreadystatechange = function(){
+		if (asset.readyState == "loaded" ||asset.readyState == "complete"){
+				asset.onreadystatechange = null;
+				return fn();
+			}
+		};
+	} else {  //Other browsers, the decent and good ones (not IE)
+		google_tag.onload = function(){
+			return fn();
+		};
+	}
+}
 
 //Expose skimr methods to the global namespace
 window.skimr = {
 	exitApp : exitApp,
 	init:	init,
 	pagination: pagination,
+	assetReady: assetReady
 }
+
 //INIT
 init();
 
