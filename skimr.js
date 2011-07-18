@@ -141,7 +141,7 @@ function postFeedInit (results) {
 		current_results_length = current_results.length;
 
 		//Allow Pagination via next button
-		 (current_results_length > entries_per_page) && next_anchor.className = 'show'; 
+		 current_results_length >= entries_per_page && (next_anchor.className = 'show'); //Not quite right, fix
 		 });
 }
 
@@ -265,11 +265,11 @@ function buildCss () {
 		+ '#skimr, #skimr * {padding: 0; margin: 0;color:#000; font-weight: normal;}\n' // reset
 
 		+ '#skimr {position:absolute;top:0;left:0;min-height:100%;width:100%; '
+			+ 'zoom:100%;'
 			+ 'background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAE'
 			+ 'AAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGC4DAAA2ADUwvUnWwAAAABJRU5E'
 			+ 'rkJggg==) transparent repeat; '
 			+ 'z-index: 99999999; '
-			//+ 'overflow: auto;'//clearfix
 			+ 'padding:0 0 30px;'//For Dashbar
 			+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; }\n'//cont'd
 
@@ -286,14 +286,35 @@ function buildCss () {
 		+ '#skimr-dashboard .hide {visibility: hidden;}'
 
 		+ '#skimr-table {background-color: #EFEFEF; max-width: 1000px; margin: 0 auto; '
-			+ 'border:solid 5px #EFEFEF;'
-			+ '-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;'
-			+ 'margin-top:20px;'
-			+ 'text-align: left;border-collapse:separate; }\n' 
+			+ '-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;'
+			+ 'margin-top:20px;width:auto;'
+			+ 'border-collapse: separate;border-spacing: 0;'
+			+ 'background-image: -webkit-gradient( linear, left 40, left top, color-stop(0.34, rgb(239,239,239)), color-stop(0.77, rgb(221,221,221)), color-stop(0.94, rgb(222,222,222))); background-image: -moz-linear-gradient( center 40, rgb(239,239,239) 34%, rgb(221,221,221) 77%, rgb(222,222,222) 94%);'
+			+ 'text-align: left;line-height: 1.9;}\n' 
 
-		+ '#skimr-table th {font-weight: normal; text-align:center;}\n'//cont'd
+		+ '#skimr-table th {font: normal 1.2em/1.8 Corbel, "Lucida Sans Unicode", "Lucida Grade", "Bitstream Vera Sans", "Luxi Serif", Verdana, sans-serif; text-shadow: 2px 2px 3px #aaa;}\n'
 
-		+ '#skimr-table a {color: #444; display: block; padding: 3px 0;}\n';
+		+ '#skimr-table th:first-child {padding: 0 0 0 5px; font-size: 1em;}\n'
+
+		+ '#skimr-table th:last-child { text-align: right;padding-right: 14px}\n'
+
+		+ '#skimr-table a {color: #333; text-decoration:none; display: block; padding-left:6px;}\n'
+
+		+ '#skimr-table a:hover {color: #333;}\n'
+
+		+ '#skimr-table tr:hover td:first-child {border-right: solid 1px #efefef;border-bottom: solid 1px #ccc;}\n'
+
+		+ '#skimr-table tr:hover td \{background-color:#CFCFCF;}\n' 
+
+		+ '#skimr-table td:first-child {color: #777; font-size: 0.9em;text-align: center; border-right: solid 1px #ccc; border-bottom:solid 1px #efefef;}\n'
+
+		+ '#skimr-table td {}\n'
+
+		+ '#skimr-table td:last-child {padding: 0 7px 0 0; border-bottom: solid 1px #ccc;}\n'
+
+		+ '#skimr-table tr:last-child:hover td {-webkit-border-bottom-left-radius:10px;-moz-border-bottom-left-radius:10px;border-bottom-left-radius:10px;}\n'
+
+		+ '#skimr-table tr:last-child td {padding-bottom: 5px; border-bottom: 0;}\n';
 
 
 	css_tag = document.createElement('style'); 
@@ -352,7 +373,7 @@ function buildListTable (offset) {
 	}
 
 	table.innerHTML = '<tr><th>yy/mm/dd</strong></th>' +
-			'<th id="skimr-title">Title</th></tr>\n' + table_contents;
+			'<th id="skimr-title">Skimr</th></tr>\n' + table_contents;
 
 	return fragment;
 }

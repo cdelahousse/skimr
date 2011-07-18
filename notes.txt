@@ -2,6 +2,7 @@
 
 fix table cell space
 
+fix font size on css3.info
 
 create loading animation for 'next' button
 
