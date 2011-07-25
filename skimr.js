@@ -262,7 +262,10 @@ function buildCss () {
 			+ 'min-width: 100% !important; margin: 0 !important; '
 			+ 'max-width: 100% !important; min-height: 100%;}\n'//For full page veil
 
-		+ '#skimr, #skimr * {padding: 0; margin: 0;color:#000; font-weight: normal;}\n' // reset
+		+ '#skimr, #skimr * {padding: 0; margin: 0;color:#000; font-weight: normal;'
+			+ 'border:0; text-transform: none; text-shadow:none; text-align: left;' // reset
+			+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif;}\n'//cont'd
+
 
 		+ '#skimr {position:absolute;top:0;left:0;min-height:100%;width:100%; '
 			+ 'zoom:100%;'
@@ -271,7 +274,9 @@ function buildCss () {
 			+ 'rkJggg==) transparent repeat; '
 			+ 'z-index: 99999999; '
 			+ 'padding:0 0 30px;'//For Dashbar
-			+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; }\n'//cont'd
+			+ ' }\n'//cont'd
+
+			//+ 'font: normal normal 16px/1.2 Helvetica, Arial, Sans-Serif; }\n'//cont'd
 
 		+ '#skimr-loading {width: 100%; background-color: #FFF; color: #000;' 
 			+ 'text-align: center;}\n'//cont'd
@@ -290,7 +295,7 @@ function buildCss () {
 			+ 'margin-top:20px;width:auto;'
 			+ 'border-collapse: separate;border-spacing: 0;'
 			+ 'background-image: -webkit-gradient( linear, left 40, left top, color-stop(0.34, rgb(239,239,239)), color-stop(0.77, rgb(221,221,221)), color-stop(0.94, rgb(222,222,222))); background-image: -moz-linear-gradient( center 40, rgb(239,239,239) 34%, rgb(221,221,221) 77%, rgb(222,222,222) 94%);'
-			+ 'text-align: left;line-height: 1.9;}\n' 
+			+ '}\n' 
 
 		+ '#skimr-table th {font: normal 1.2em/1.8 Corbel, "Lucida Sans Unicode", "Lucida Grade", "Bitstream Vera Sans", "Luxi Serif", Verdana, sans-serif; text-shadow: 2px 2px 3px #aaa;}\n'
 
@@ -308,7 +313,7 @@ function buildCss () {
 
 		+ '#skimr-table td:first-child {color: #777; font-size: 0.9em;text-align: center; border-right: solid 1px #ccc; border-bottom:solid 1px #efefef;}\n'
 
-		+ '#skimr-table td {}\n'
+		+ '#skimr-table td {line-height: 1.9;}\n'
 
 		+ '#skimr-table td:last-child {padding: 0 7px 0 0; border-bottom: solid 1px #ccc;}\n'
 

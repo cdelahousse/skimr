@@ -2,3 +2,5 @@
 default.css
 mashable.xml
 Session.vim
+*~
+*.swp

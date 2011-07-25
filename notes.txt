@@ -1,4 +1,10 @@
-﻿add end and beginning anchors
+﻿
+
+Add name of website at top of list, (outside of it)
+
+add end and beginning anchors
+
+fix on youtube.com, video overlaps, something to do with flash
 
 fix table cell space
 
@@ -34,6 +40,13 @@ After link list, add extra div saying: STOP SCROLLING NOW OR END UP IN THE ABYYS
 Add quick resume of article beneath title link. This could eventually be a function that searches for keyword density
 
 If can't find feed, warn user: this means modifying getFeedURL and goog Feed lookup fallback to return false if nothing's found.
+
+
+SITE:
+FB Like button
+3-4image animation on how to use, maybe a screencast
+use git
+scale screenshot
 
 FUCNTIONALITY TO ADD:
 -divide skmir window in two. The first thing to appear on right screen is how to use skimr
