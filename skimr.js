@@ -377,7 +377,7 @@ function buildListTable (offset) {
 			'<td><a href="' + entry.link + '"> ' + entry.title + '</a></td></tr>\n';
 	}
 
-	table.innerHTML = '<tr><th>yy/mm/dd</strong></th>' +
+	table.innerHTML = '<tr><th>yy/mm/dd</th>' +
 			'<th id="skimr-title">Skimr</th></tr>\n' + table_contents;
 
 	return fragment;
