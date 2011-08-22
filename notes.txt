@@ -1,14 +1,18 @@
 ﻿
+fix on http://www.shopify.com/technology?page=2#   full screen overlay. Next button
+not disappearing at end
+
+add child selector to the css  > . More efficient that descendant selector
 
 Add name of website at top of list, (outside of it)
 
 add end and beginning anchors
 
+doesn't work on http://blog.rosseaux.net/en/#
+
+gets comments feed on http://net.tutsplus.com/tutorials/javascript-ajax/getting-started-with-backbone-js/#
+
 fix on youtube.com, video overlaps, something to do with flash
-
-fix table cell space
-
-fix font size on css3.info
 
 create loading animation for 'next' button
 
@@ -46,7 +50,7 @@ SITE:
 FB Like button
 3-4image animation on how to use, maybe a screencast
 use git
-scale screenshot
+add "see code on github" link
 
 FUCNTIONALITY TO ADD:
 -divide skmir window in two. The first thing to appear on right screen is how to use skimr
