@@ -60,8 +60,8 @@ function init () {
 
 	document.body.appendChild(fragment);
 
-	//Set events to UI
-	eventDelegation(skimr_div);
+	//Set events
+	eventDelegation();
 	
 	//Check to see if the google tag is loaded
 	//and pass loadFeedAPI
@@ -158,11 +158,32 @@ function pagination (offset) {
 }
 
 //Attaches events to UI
-function eventDelegation (elem) {
-	elem.onclick = function (event){
-		var target;
+function eventDelegation () {
+
+	var doc = document;
+	if (doc.addEventListener){ //W3c
+		doc.addEventListener("keydown", keyEvents, false);
+		doc.addEventListener("click", clickEvents, false);
+	}
+	else if (doc.attachEvent){ //IE, ew... 
+		doc.attachEvent("onkeydown", keyEvents);
+		doc.attachEvent("onclick", clickEvents);
+	}
+
+	//Keyboard Events	
+	function keyEvents (event) {
 		event || (event = window.event); //For IE. Ew...
-		target = event.target || event.src; //W3C || IE. Ewy.. Gross...  
+
+		//ESC key
+		if (event.keyCode === 27) {
+			exitApp();
+		}
+	}
+
+	//Click Events
+	function clickEvents (event){
+		event || (event = window.event); //For IE. Ew...
+		var target = event.target || event.src; //W3C || IE. Ewy.. Gross... 
 
 		switch (target.id) {
 			case 'skimr-exit':

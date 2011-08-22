@@ -1,14 +1,13 @@
 ﻿
-fix on http://www.shopify.com/technology?page=2#   full screen overlay. Next button
-not disappearing at end
+mouse hover on bottom cell shows rounded corners in cells
+
+fix on http://www.shopify.com/technology?page=2#   full screen overlay. 
 
 add child selector to the css  > . More efficient that descendant selector
 
 Add name of website at top of list, (outside of it)
 
-add end and beginning anchors
-
-doesn't work on http://blog.rosseaux.net/en/#
+add end and beginning navigation anchors
 
 gets comments feed on http://net.tutsplus.com/tutorials/javascript-ajax/getting-started-with-backbone-js/#
 
@@ -77,3 +76,5 @@ fix in firefox. (3entries only);
 make work on HTML5Boilerplate.com site (no feed)
 fix table border mashable and techcrunch
 if initial amount of entries smaller than entries per page, hide next button and avoid preload
+doesn't work on http://blog.rosseaux.net/en/#
+ESC key exits app
