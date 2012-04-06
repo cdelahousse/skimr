@@ -23,8 +23,7 @@ var	google,
 		num_max_entries = 250, //Google feed API maxes out at 250
 		rss_url,
 		current_offset = 0,
-		current_results = null,
-		current_results_length = 0;
+		current_results = null;
 
 
 //Initilisation
@@ -78,7 +77,7 @@ function init () {
 		});
 }
 
-// (re)initalise the feed
+// (re)initalise the feed using google feed api
 function initFeed (num,callback) {
 	var google_feed; //Google Feed object
 	
@@ -123,7 +122,6 @@ function postFeedInit (results) {
 	
 	//Update skimr class properties
 	current_results = results.feed.entries; 
-	current_results_length = current_results.length;
 
 	//Element that houses feed links
 	list_table = buildListTable();
@@ -138,10 +136,9 @@ function postFeedInit (results) {
 		//is still return. There are now two result objects within the
 		//scope. Weird, huh?
 		current_results = this.feed.entries;
-		current_results_length = current_results.length;
 
 		//Allow Pagination via next button
-		 current_results_length >= entries_per_page && (next_anchor.className = 'show'); //Not quite right, fix
+		 current_results.length >= entries_per_page && (next_anchor.className = 'show'); //Not quite right, fix
 		 });
 }
 
@@ -149,7 +146,7 @@ function pagination (offset) {
 
 	current_offset += offset;
 
-	next_anchor.className = offset >= (current_results_length - current_offset) ? 'hide': 'show';
+	next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
 	prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
 	remNode(document.getElementById('skimr-table'));
 	list_table = buildListTable(offset); //Rebuild link list
@@ -372,8 +369,8 @@ function buildListTable (offset) {
 	offset || (offset = entries_per_page); // If no offset given, default entries per page
 	entries = current_results;
 
-	end = ((current_offset + offset) > current_results_length) ? // if desired offset will be more than results
-		current_results_length : //Just do remaining items
+	end = ((current_offset + offset) > current_results.length) ? // if desired offset will be more than results
+		current_results.length : //Just do remaining items
 		current_offset + Math.abs(offset); 
 
 	//console.log('current_off: ',current_offset); //xxx
