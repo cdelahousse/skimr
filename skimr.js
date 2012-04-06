@@ -171,9 +171,22 @@ function eventDelegation () {
 	function keyEvents (event) {
 		event || (event = window.event); //Handle IE window.event. Ew...
 
-		//ESC key
-		if (event.keyCode === 27) {
-			exitApp();
+
+		switch (event.keyCode) {
+			//Escape key
+			case 27:
+				exitApp();
+				break;
+
+			//Left arrow
+			case 37:
+				current_offset > 0 && pagination(-entries_per_page);
+				break;
+
+			//Right
+			case 39:
+				entries_per_page >= (current_results.length - current_offset) || pagination(entries_per_page);
+				break;
 		}
 	}
 
