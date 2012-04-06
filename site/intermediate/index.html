@@ -8,13 +8,14 @@
   <meta charset="utf-8">
 
 	<title>skimr bookmarklet | The quick way to skim through a website</title>
-  <meta name="description" content="Skimr is a bookmarklet that lets you skim a website's entries.">
+  <meta name="description" content="Skimr is a bookmarklet that lets you skim a
+website's entries, free of distractions.">
   <meta name="author" content="Christian Delahousse">
-	<link href='http://fonts.googleapis.com/css?family=Open+Sans|Chewy&v2' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="alternate" type="application/rss+xml" title="TechCrunch RSS Feed" href="http://feedproxy.google.com/TechCrunch" />
 
-  <link rel="stylesheet" href="css/f6bd3e0e9b86be341d8123fb583f279d29fea85c.css">
+  <link rel="stylesheet" href="css/1ccf204b6e4ae755c13f3433dcaf841e7edca233.css">
 	<script>//HTML5Shiv
 		/*@cc_on'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.replace(/\w+/g,function(n){document.createElement(n)})@*/
 	</script>
@@ -32,23 +33,28 @@
 		<!--</header>-->
 			<div id="the-copy">
 				<h1>Skimr</h1>
-				<h2>The quick way to skim through a website</h2>
-				<p id="main-text">With one click, see all of a website's posts without suffering through interminable loading times nor browsing through endless archives. Skimr is a bookmarklet, so its installation is harmless. It'll always be close but easy to remove.</p>
+				<h2>Distraction free site overviews</h2>
+				<p id="main-text">With one click, see all of a website's posts without
+					suffering through interminable loading times nor browsing through endless
+					archives. Skimr is a bookmarklet, so it'll always be close at hand, its
+					installation is harmless and it's easy to remove. </p>
 			<div id="call-to-action">
 				<a href="javascript:(function(){window.skimr&&window.skimr.exitApp();window.skimr_script=document.createElement('script');skimr_script.src='//delahousse.ca/skimr/skimr.min.js';(document.head||document.body).appendChild(skimr_script)})();" id="Skimr" name="Skimr Bookmarklet">Skimr</a>
 				<span id="try-it-now"><strong>Try it now!</strong></span>
-				<span id="click">Click to see how it works as if on TechCrunch</span>
-				<p id="install">To install Skimr, simply drag the button to you bookmarks bar or Right-Click on it to save it to your bookmarks</p>
+				<span id="click">Click to see how it works as if on TechCrunch.com</span>
+				<p id="install">To install Skimr, simply drag the red button to you bookmarks
+					bar or right-click it and save it to your bookmarks</p>
 			</div>
 			<div id="disclaimer">
-				Sorry Internet Explorer people, Skimr was only tested in Chrome and Firefox. I'll get to it, I promise...
+				Sorry Internet Explorer people, Skimr was only tested in Chrome and Firefox.
 			</div>
 		</div>
 		<div id="screenshot">
 			<img src="img/mash_skimr.jpg" />
 		</div>	
 		<footer>
-			Proudly made by <a href="//delahousse.ca">Christian Delahousse</a>.
+			Proudly made by <a href="//delahousse.ca">Christian Delahousse</a>. Take a peek
+			at the <a href="https://github.com/cdelahousse/skimr">code</a> on GitHub.
     </footer>
     </div>
   </div> <!--! end of #container -->
@@ -62,14 +68,20 @@
   <script src='js/855194a64c8954a7a72b33695cdcbc2cbe15fff1.js'></script>
 
 	
-  <!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
-  <script>
-    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview'],['_trackPageLoadTime']];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-    s.parentNode.insertBefore(g,s)}(document,'script'));
-  </script>
+<script type="text/javascript">
 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-12011654-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ 
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
        chromium.org/developers/how-tos/chrome-frame-getting-started -->

@@ -172,7 +172,7 @@ function eventDelegation () {
 
 	//Keyboard Events	
 	function keyEvents (event) {
-		event || (event = window.event); //For IE. Ew...
+		event || (event = window.event); //Handle IE window.event. Ew...
 
 		//ESC key
 		if (event.keyCode === 27) {
@@ -195,7 +195,6 @@ function eventDelegation () {
 			case 'skimr-prev':
 			pagination(-entries_per_page);
 			break;
-
 		};
 	}
 }
