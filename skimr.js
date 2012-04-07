@@ -355,11 +355,14 @@ function buildCss () {
 
 		+ '#skimr-table td:first-child {color: #777; font-size: 0.9em;text-align: center; border-right: solid 1px #ccc; border-bottom:solid 1px #efefef;}\n'
 
-		+ '#skimr-table td {line-height: 1.9;}\n'
+		+ '#skimr-table td {line-height: 2.7;}\n'
 
 		+ '#skimr-table td:last-child {padding: 0 7px 0 0; border-bottom: solid 1px #ccc;}\n'
 
-		+ '#skimr-table tr:last-child:hover td {-webkit-border-bottom-left-radius:10px;-moz-border-bottom-left-radius:10px;border-bottom-left-radius:10px;}\n'
+		+ '#skimr-table tr:last-child:hover td:first-child {-webkit-border-bottom-left-radius:10px;-moz-border-bottom-left-radius:10px;border-bottom-left-radius:10px;}\n'
+		
+		+ '#skimr-table tr:last-child:hover td:last-child {-webkit-border-bottom-right-radius:10px;-moz-border-bottom-right-radius:10px;border-bottom-right-radius:10px;}\n'
+
 
 		+ '#skimr-table tr:last-child td {padding-bottom: 5px; border-bottom: 0;}\n';
 
