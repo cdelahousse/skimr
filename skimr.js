@@ -364,7 +364,7 @@ function buildCss () {
 		+ '#skimr-table tr:last-child:hover td:last-child {-webkit-border-bottom-right-radius:10px;-moz-border-bottom-right-radius:10px;border-bottom-right-radius:10px;}\n'
 
 
-		+ '#skimr-table tr:last-child td {padding-bottom: 5px; border-bottom: 0;}\n';
+		+ '#skimr-table tr:last-child td {padding-bottom: 2px; border-bottom: 0;}\n';
 
 
 	css_tag = document.createElement('style'); 
