@@ -22,6 +22,7 @@ var	google,
 		entries_per_page = 50,  //Entries per page
 		num_max_entries = 250, //Google feed API maxes out at 250
 		rss_url,
+		rss_urls = {},
 		current_offset = 0,
 		current_results = null;
 
@@ -180,11 +181,13 @@ function eventDelegation () {
 
 			//Left arrow
 			case 37:
+				//don't go back when on first listings
 				current_offset > 0 && pagination(-entries_per_page);
 				break;
 
 			//Right
 			case 39:
+				//don't go forward when none lie beyond current page listings
 				entries_per_page >= (current_results.length - current_offset) || pagination(entries_per_page);
 				break;
 		}
@@ -207,6 +210,12 @@ function eventDelegation () {
 			break;
 		};
 	}
+}
+
+
+//Builds object with all rss links
+function findRSSLinks() {
+
 }
 
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
@@ -477,7 +486,7 @@ function assetReady(asset,fn) {
 			}
 		};
 	} else {  //Other browsers, the decent and good ones (not IE)
-		google_tag.onload = function(){
+		asset.onload = function(){
 			return fn();
 		};
 	}
