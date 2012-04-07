@@ -35,6 +35,20 @@ function init () {
 	google_tag = buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
 	
+	
+	//Check to see if the google tag is loaded
+	//and pass loadFeedAPI
+	assetReady(google_tag, function () {
+
+			//Move google loader object into local scope
+			google = window.google;
+
+			google.load('feeds', '1', {
+				"callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
+				"nocss": true
+				});
+
+		});
 
 	//Scroll to top
 	window.scroll(0,0);
@@ -53,20 +67,6 @@ function init () {
 
 	//Set events
 	eventDelegation();
-	
-	//Check to see if the google tag is loaded
-	//and pass loadFeedAPI
-	assetReady(google_tag, function () {
-
-			//Move google loader object into local scope
-			google = window.google;
-
-			google.load('feeds', '1', {
-				"callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
-				"nocss": true
-				});
-
-		});
 }
 //Try to find RSS URL
 function setUpFeedURL() {
