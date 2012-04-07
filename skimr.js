@@ -220,12 +220,6 @@ function eventDelegation () {
 	}
 }
 
-
-//Builds object with all rss links
-function findRSSLinks() {
-
-}
-
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
 //the hypertext reference. If none, returns false
 function getRSSLink () {
@@ -401,11 +395,6 @@ function buildListTable (offset) {
 		current_results.length : //Just do remaining items
 		current_offset + Math.abs(offset); 
 
-	//console.log('current_off: ',current_offset); //xxx
-	//console.log('offset: ', offset); //xxx
-	//console.log(current_offset, ', end: ',  end) //xxx
-
-	
 	//Creates anchor tags, adds hypertext reference
 	for (var i = current_offset; i < end; i++) { 
 		entry = entries[i];
