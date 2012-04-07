@@ -35,15 +35,6 @@ function init () {
 	google_tag = buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
 	
-	rss_url = getRSSLink(); //Find RSS URL
-
-	//if getRSSLink fails, exit app with warning to the user
-	if (!rss_url) {
-		alert("Skimr can't work on this page");
-		exitApp();
-		return;
-	}
-	//TODO: make warning be sliding box. Unobtrusive warning;
 
 	//Scroll to top
 	window.scroll(0,0);
@@ -71,13 +62,21 @@ function init () {
 			google = window.google;
 
 			google.load('feeds', '1', {
-				"callback": initFeed, //Once the feed api is loaded, it calls initFeed() 
+				"callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
 				"nocss": true
 				});
 
 		});
 }
+//Try to find RSS URL
+function setUpFeedURL() {
+	rss_url = getRSSLink(); //Find RSS URL
+	
+	//run googleFeedLookup if no <link> rss exists
+	
+	rss_url ? initFeed() : googleFeedLookup(window.location,initFeed);
 
+}
 // (re)initalise the feed using google feed api
 function initFeed (num,callback) {
 	var google_feed; //Google Feed object
@@ -92,14 +91,23 @@ function initFeed (num,callback) {
 	//Callback to be called once feed has been received by GoogFeedAPI
 	//Default to postFeedInit
 	callback || (callback = postFeedInit);
+
+	//if getRSSLink fails, exit app with warning to the user
+	if (!rss_url) {
+		alert("Skimr can't work on this page");
+		exitApp();
+		return;
+	}
+
+	//TODO: make warning be sliding box. Unobtrusive warning;
+
 	google_feed = new google.feeds.Feed(rss_url);
 	
 	//Initialise feed settings
 	google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
 	google_feed.includeHistoricalEntries();
 	google_feed.setNumEntries(num);
-	//Once feed is loaded, callback funtion. Default: postFeedInit
-	google_feed.load(callback);
+	google_feed.load(callback); //Default callback: postFeedInit
 }
 
 //What to do once feed has been initialised
@@ -139,7 +147,7 @@ function postFeedInit (results) {
 		current_results = this.feed.entries;
 
 		//Allow Pagination via next button
-		 current_results.length >= entries_per_page && (next_anchor.className = 'show'); //Not quite right, fix
+		 current_results.length >= entries_per_page && (next_anchor.className = 'show');
 		 });
 }
 
@@ -233,14 +241,11 @@ function getRSSLink () {
 		current_node = link_nodes[i];
 		node_type = current_node.getAttribute('type');
 
-		//console.log(node_type);	
-
 		//Get first RSS or Atom match
 		if (node_type == 'application/rss+xml' || node_type == 'application/atom+xml') {
 
 			rss_link = current_node.getAttribute('href');
 
-			//console.log('RSS Link pre change', rss_link)
 			//If it's not a full on URL, we need to convert it to one
 			if (!rss_link.match(/^http/)) {
 				var absolute_path = (rss_link.match(/^\//)) ? '': location.pathname;
@@ -250,17 +255,15 @@ function getRSSLink () {
 			break;
 		}
 	}
-	return rss_link || googleFeedLookup(location); //google feed lookup as backup
+	return rss_link;
 }
 
-function googleFeedLookup (url){
-	return assetReady(google_tag, function(){
-
+//Use feed api to find feed URL
+function googleFeedLookup (url,callback){
 		google.feeds.lookupFeed(url,function(results){
-			var feed = results.url || false;
-			console.log('Google Feed Lookup returned: ',feed)
-			return feed;
-		});
+			rss_url = results.url;
+			console.log('Google Feed Lookup returned: ',results.url)
+			callback();
 	});
 }
 
