@@ -478,6 +478,7 @@ function assetReady(asset,fn) {
 	//the Google JS API is weird and takes a while to load,
 	//so we need to be sure to load it completely before we continue, hence the onload.
 	//http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
+	//Note: I DID NOT TEST THIS IN IE
 	if (asset.readyState){  //IE
 		asset.onreadystatechange = function(){
 		if (asset.readyState == "loaded" ||asset.readyState == "complete"){
@@ -486,9 +487,7 @@ function assetReady(asset,fn) {
 			}
 		};
 	} else {  //Other browsers, the decent and good ones (not IE)
-		asset.onload = function(){
-			return fn();
-		};
+		asset.addEventListener('load',fn);
 	}
 }
 
