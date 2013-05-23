@@ -4,3 +4,4 @@ mashable.xml
 Session.vim
 *~
 *.swp
+*.min.js
