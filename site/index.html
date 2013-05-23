@@ -1,9 +1,5 @@
 <!doctype html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<html lang="en">
 <head>
   <meta charset="utf-8">
 
@@ -13,15 +9,17 @@ website's entries, free of distractions.">
   <meta name="author" content="Christian Delahousse">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--For testing -->
 	<link rel="alternate" type="application/rss+xml" title="TechCrunch RSS Feed" href="http://feedproxy.google.com/TechCrunch" />
 
   <link rel="stylesheet" href="css/style.css">
-	<script>//HTML5Shiv
-		/*@cc_on'abbr article aside audio canvas details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.replace(/\w+/g,function(n){document.createElement(n)})@*/
+  <script>
+    //HTML5Shiv
+    /*@cc_on'abbr article aside audio canvas details figcaption figure footer \
+    header hgroup mark meter nav output progress section summary time video'
+    .replace(/\w+/g,function(n){document.createElement(n)})@*/
 	</script>
-  <!-- CSS: implied media="all" -->
-
-  <!-- More ideas for your <head> here: h5bp.com/docs/#head-Tips -->
 
 </head>
 
@@ -29,8 +27,6 @@ website's entries, free of distractions.">
 
   <div id="container">
     <div id="main" class="clearfix" role="main">
-		<!--<header>-->
-		<!--</header>-->
 			<div id="the-copy">
 				<h1>Skimr</h1>
 				<h2>Distraction free site overviews</h2>
@@ -39,7 +35,8 @@ website's entries, free of distractions.">
 					archives. Skimr is a bookmarklet, so it'll always be close at hand, its
 					installation is harmless and it's easy to remove. </p>
 			<div id="call-to-action">
-				<a href="javascript:(function(){window.skimr&&window.skimr.exitApp();window.skimr_script=document.createElement('script');skimr_script.src='//delahousse.ca/skimr/skimr.min.js';(document.head||document.body).appendChild(skimr_script)})();" id="Skimr" name="Skimr Bookmarklet">Skimr</a>
+				<a
+				  href="javascript:(function(){window.skimr&&window.skimr.exitApp();window.skimr_script=document.createElement('script');skimr_script.src='//christian.delahousse.ca/skimr/skimr.min.js';(document.head||document.body).appendChild(skimr_script)})();" id="Skimr" name="Skimr Bookmarklet">Skimr</a>
 				<span id="try-it-now"><strong>Try it now!</strong></span>
 				<span id="click">Click to see how it works as if on TechCrunch.com</span>
 				<p id="install">To install Skimr, simply drag the red button to you bookmarks
@@ -53,21 +50,12 @@ website's entries, free of distractions.">
 			<img src="img/mash_skimr.jpg" />
 		</div>	
 		<footer>
-			Proudly made by <a href="//delahousse.ca">Christian Delahousse</a>. Take a peek
+			Proudly made by <a href="//christian.delahousse.ca">Christian Delahousse</a>. Take a peek
 			at the <a href="https://github.com/cdelahousse/skimr">code</a> on GitHub.
     </footer>
     </div>
-  </div> <!--! end of #container -->
+  </div> 
 
-
-
-  <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
-  <!--<script>window.jQuery || document.write('<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.min.js"><\/script>')</script>-->
-
-
-  <!-- scripts concatenated and minified via ant build script-->
-  <!--<script src="js/script.js"></script>-->
-  <!-- end scripts-->
 
 	
 <script type="text/javascript">
@@ -85,12 +73,5 @@ website's entries, free of distractions.">
 </script>
  
 
-  <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
-       chromium.org/developers/how-tos/chrome-frame-getting-started -->
-  <!--[if lt IE 7 ]>
-    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
-    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
-  <![endif]-->
-  
 </body>
 </html>
