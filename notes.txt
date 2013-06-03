@@ -3,7 +3,6 @@ mouse hover on bottom cell shows rounded corners in cells
 
 fix on http://www.shopify.com/technology?page=2#   full screen overlay. 
 
-add child selector to the css  > . More efficient that descendant selector
 
 Add name of website at top of list, (outside of it)
 
