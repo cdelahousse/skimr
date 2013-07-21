@@ -266,7 +266,7 @@ var ui = {
   //Constants
   NAMESPACE : 'skimr',
   IDNAMESPACE : 'skimr-' ,
-  current_results : [],
+  current_results : [], //TODO Make this work
   buildUi : function () {
 
     //Scroll to top
@@ -277,7 +277,7 @@ var ui = {
     var fragment = document.createDocumentFragment();
 
     skimr_div = this.buildTag('div', this.NAMESPACE, '');
-    css_tag = this.buildCssTag();	//Add CSS style tag 
+    css_tag = this.buildTag('style','',this.css); 
     loading_div = this.buildTag('div', this.IDNAMESPACE + 'loading', 'Loading...');
     dashboard_div = this.buildDashboard();
 
@@ -393,18 +393,6 @@ var ui = {
     this.remElem(document.getElementById(this.IDNAMESPACE + 'table'));
     list_table = this.buildListTable(offset); //Rebuild link list
     skimr_div.appendChild(list_table); 
-  },
-  buildCssTag : function () {
-    var css_tag = document.createElement('style'); 
-
-    try {
-      css_tag.appendChild(document.createTextNode(this.css) ); //W3C
-    } catch (e) {
-      if (css_tag.styleSheet) { //IE. Ew.
-        css_tag.styleSheet.cssText =  css;
-      }
-    }
-    return css_tag;
   },
   css : (function () {/*
     html {position: relative;}
