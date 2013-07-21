@@ -30,7 +30,6 @@ function init () {
 	google_tag = buildGoogleTag();
 	document.getElementsByTagName('head')[0].appendChild( google_tag );
 	
-	
 	//Check to see if the google tag is loaded
 	//and pass loadFeedAPI
 	assetReady(google_tag, function () {
@@ -46,7 +45,6 @@ function init () {
 		});
 
 	ui.buildUi();
-
 
 	//Set events
 	eventDelegation();
@@ -112,17 +110,15 @@ function postFeedInit (results) {
 	current_results = results.feed.entries; 
 
   //TODO THIS IS WHERE NEW RESULTS SHOULD BE PASSED IN
-  ui.updateUi( current_results );
+  ui.updateUi( results.feed.entries );
 
 	//Preload remaining for pagination
 	initFeed(num_max_entries,function (){
-		//For some reason, when sending this fucntion as a callback,
-		//the returned results object is 'this'. The old results object
-		//is still return. There are now two result objects within the
-		//scope. Weird, huh?
 		current_results = this.feed.entries;
+    //XXX SHOULD BE THIS ui.updateUi( results.feed.entries );
 
 		//Allow Pagination via next button
+		// TODO Refactor this out
     current_results.length >= entries_per_page && (next_anchor.className = 'show');
   });
 }
@@ -235,15 +231,12 @@ function buildGoogleTag (){
 
 function exitApp () {
 
-	remNode(skimr_div);
-	remNode(css_tag);
-	remNode(google_tag);
-	remNode(window.skimr_script);
+  ui.deleteUi();
 
 	//Delete global object;
 	window.skimr && (delete window.skimr);
 	
-
+  skimr_script && skimr_script.parentNode.removeChild( skimr_script );
 	//Delete script tag created by outside run script
 	window.skimr_script && (delete window.skimr_script); 
 	//For outside run script test (window.skmir.exitApp)
@@ -251,10 +244,6 @@ function exitApp () {
 
 }
 
-//Helper functions
-function remNode(elem) {//If fails, returns false
-	return elem && elem.parentNode.removeChild(elem);
-}
 //Run fn when given asset is  loaded
 function assetReady(asset,fn) {
 	//the Google JS API is weird and takes a while to load,
@@ -283,7 +272,6 @@ var ui = {
     //Scroll to top
     window.scroll(0,0);
 
-
     //TODO Implement templating system 
    
     var fragment = document.createDocumentFragment();
@@ -301,9 +289,10 @@ var ui = {
     document.body.appendChild(fragment);
 
   },
+  //Refactor so that current_result is local
   updateUi : function (current_results) {
     if (loading_div) {
-      remNode(loading_div);
+      this.remElem(loading_div);
       loading_div = undefined;
     }
 
@@ -312,6 +301,15 @@ var ui = {
     //Append to main element
     skimr_div.appendChild(list_table);
 
+  },
+  deleteUi : function () {
+    this.remElem(skimr_div);
+    this.remElem(css_tag);
+    this.remElem(google_tag);
+
+  },
+  remElem : function (elem) {
+    return elem && elem.parentNode.removeChild(elem);
   },
   buildTag : function (type, id, content) {
     var elem = document.createElement(type);
@@ -392,7 +390,7 @@ var ui = {
 
     next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
     prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
-    remNode(document.getElementById('skimr-table'));
+    this.remElem(document.getElementById('skimr-table'));
     list_table = this.buildListTable(offset); //Rebuild link list
     skimr_div.appendChild(list_table);
   },
