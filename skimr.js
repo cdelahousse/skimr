@@ -321,10 +321,10 @@ var ui = {
     var dashboard_div = this.buildTag('div', this.IDNAMESPACE + 'dashboard', ''); 
 
     var buildAnchor = this.buildAnchor;
-    exit_anchor = buildAnchor('Exit','skimr-exit'); 
+    exit_anchor = buildAnchor('Exit',this.IDNAMESPACE + 'exit'); 
     //Default: hide class while preloading the next google feed results 
-    next_anchor = buildAnchor('Next','skimr-next','hide');
-    prev_anchor = buildAnchor('Prev','skimr-prev','hide');
+    next_anchor = buildAnchor('Next',this.IDNAMESPACE + 'next','hide');
+    prev_anchor = buildAnchor('Prev',this.IDNAMESPACE + 'prev','hide');
 
     dashboard_div.appendChild(prev_anchor);
     dashboard_div.appendChild(exit_anchor);
@@ -355,7 +355,7 @@ var ui = {
         dd;
     
     fragment.appendChild(table);
-    table.id = 'skimr-table';
+    table.id = this.IDNAMESPACE + 'table';
 
     offset || (offset = entries_per_page); // If no offset given, default entries per page
 
@@ -390,7 +390,7 @@ var ui = {
 
     next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
     prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
-    this.remElem(document.getElementById('skimr-table'));
+    this.remElem(document.getElementById(this.IDNAMESPACE + 'table'));
     list_table = this.buildListTable(offset); //Rebuild link list
     skimr_div.appendChild(list_table);
   },
