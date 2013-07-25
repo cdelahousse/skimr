@@ -35,7 +35,6 @@ function init () {
 
   ui.buildUi();
 
-  eventDelegation();
 }
 //Try to find RSS URL
 function setUpFeedURL() {
@@ -111,57 +110,6 @@ function processFeed(results) {
   });
 }
 
-//Attaches events to UI
-function eventDelegation () {
-
-  var doc = document;
-  if (doc.addEventListener){ 
-    doc.addEventListener("keydown", keyEvents, false);
-    doc.addEventListener("click", clickEvents, false);
-  }
-
-  //Keyboard Events 
-  function keyEvents (event) {
-    event || (event = window.event); //Handle IE window.event. Ew...
-
-
-    switch (event.keyCode) {
-      //Escape key
-      case 27:
-        exitApp();
-        break;
-
-      //Left arrow
-      case 37:
-        //don't go back when on first listings
-        current_offset > 0 && ui.pagination(-entries_per_page);
-        break;
-
-      //Right
-      case 39:
-        //don't go forward when none lie beyond current page listings
-        entries_per_page >= (current_results.length - current_offset) || ui.pagination(entries_per_page);
-        break;
-    }
-  }
-
-  //Click Events
-  function clickEvents (event){
-    var target = event.target;
-
-    switch (target.id) {
-      case 'skimr-exit':
-      exitApp();
-      break;
-      case 'skimr-next':
-      ui.pagination(entries_per_page);
-      break;
-      case 'skimr-prev':
-      ui.pagination(-entries_per_page);
-      break;
-    }
-  }
-}
 
 //Scans the <link> tags. Searches for type - application/rss+xml and returns
 //the hypertext reference. If none, returns false
@@ -279,6 +227,8 @@ var ui = {
 
     document.body.appendChild(fragment);
 
+    this.attachEvents();
+
   },
   //Refactor so that current_result is local
   updateUi : function (current_results) {
@@ -290,6 +240,7 @@ var ui = {
 
     //Element that houses feed links
     this.list_table = this.buildListTable();
+
     //Append to main element
     this.skimr_div.appendChild(this.list_table);
 
@@ -385,6 +336,50 @@ var ui = {
     this.remElem(document.getElementById(this.IDNAMESPACE + 'table'));
     this.list_table = this.buildListTable(offset); //Rebuild link list
     this.skimr_div.appendChild(this.list_table); 
+  },
+  attachEvents : function () {
+
+    this.skimr_div.addEventListener("keydown", keyEvents, false);
+    this.skimr_div.addEventListener("click", clickEvents, false);
+
+    function keyEvents (event) {
+      switch (event.keyCode) {
+        //Escape key
+        case 27:
+          exitApp();
+          break;
+
+          //Left arrow
+        case 37:
+          //don't go back when on first listings
+          current_offset > 0 && ui.pagination(-entries_per_page);
+          break;
+
+          //Right
+        case 39:
+          //don't go forward when none lie beyond current page listings
+          entries_per_page >= (current_results.length - current_offset) || ui.pagination(entries_per_page);
+          break;
+      }
+    }
+
+    var that = this;
+    function clickEvents (event){
+      var target = event.target;
+
+      switch (target.id) {
+        case 'skimr':  //Click the veil
+        case 'skimr-exit':
+          exitApp();
+          break;
+        case 'skimr-next':
+          that.pagination(entries_per_page);
+          break;
+        case 'skimr-prev':
+          that.pagination(-entries_per_page);
+          break;
+      }
+    }
   },
   css : (function () {/*
     html {position: relative;}
