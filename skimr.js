@@ -8,13 +8,20 @@ var entries_per_page = 50,
     current_offset = 0;
 
 
-//Initilisation
 function init () {
 
-
-  loadGoogle( determineFeedUrl );
   ui.buildUi();
 
+  loadGoogle( 
+    determineFeedUrl.bind(null, 
+      //Get only a few feeds at first
+      initFeed.bind(null, entries_per_page,
+        //Update UI
+        processFeed.bind(null,
+          // Get the rest of the feeds
+          initFeed.bind( null, num_max_entries, 
+            //Update UI
+            processFeed.bind( null, null ))))));
 }
 
 // Load Google JS loader
@@ -29,28 +36,22 @@ function loadGoogle(callback) {
       "nocss": true
     });
   });
-
 }
+
 //Try to find RSS URL
-function determineFeedUrl() {
+function determineFeedUrl(callback) {
   rss_url = getRSSLink(); //Find RSS URL
 
   //run googleFeedLookup if no <link> rss exists
-
-  rss_url ? initFeed() : googleFeedLookup(window.location,initFeed);
+  rss_url ? callback() : googleFeedLookup(window.location,callback);
 
 }
-// (re)initalise the feed using google feed api
-function initFeed (num,callback) {
+
+//Get entries of a feed
+function initFeed (number_to_grab,callback) {
 
   //Bugfix: for some odd reason, in firefox, Google obj returns 3 as an argument
-  num === 3 && (num = undefined);
-
-  //Number of entries to request
-  num || (num = entries_per_page); // http://jsperf.com/conditional-assignment 
-
-  //Callback to be called once feed has been received by GoogFeedAPI
-  callback || (callback = processFeed);
+  number_to_grab === 3 && (number_to_grab = undefined);
 
   //if getRSSLink fails, exit app with warning to the user
   if (!rss_url) {
@@ -66,17 +67,15 @@ function initFeed (num,callback) {
   //Initialise feed settings
   google_feed.setResultFormat(window.google.feeds.Feed.JSON_FORMAT);
   google_feed.includeHistoricalEntries();
-  google_feed.setNumEntries(num);
-  google_feed.load(callback); //Default callback: processFeed
+  google_feed.setNumEntries(number_to_grab);
+  google_feed.load(callback); 
 }
 
-//What to do once feed has been initialised
-//var results is passed for the google feed api (see initFeed)
-function processFeed(results) {
+//Feed processing and updating UI
+function processFeed(callback,results) {
   var entries;
 
   //TODO WE NEED TO IMPLEMENT PROPER ERROR HANDLING
-  //TODO If we do implement error handling, move to program code, not methods. I think...
   // If feed doesn't load or doesn't exist, exit app
   if (results.status.code === 400){
     alert('Woops, there is a problem with the feed'); 
@@ -86,12 +85,7 @@ function processFeed(results) {
 
   ui.updateUi( results.feed.entries );
 
-  //Preload remaining for pagination
-  initFeed(num_max_entries,function (r){
-
-    ui.updateUi( r.feed.entries );
-
-  });
+  callback && callback();
 }
 
 
@@ -315,12 +309,13 @@ var ui = {
           //Left arrow
         case 37:
           //don't go back when on first listings
-          current_offset > 0 && ui.pagination(-entries_per_page);
+          current_offset > 0 && ui.pagination(-entries_per_page); //TODO Move this logic to pagination()
           break;
 
           //Right
         case 39:
           //don't go forward when none lie beyond current page listings
+          //TODO Move this logic to pagination()
           entries_per_page >= (this.entries.length - current_offset) || this.pagination(entries_per_page);
           break;
       }
