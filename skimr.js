@@ -1,9 +1,7 @@
 (function(window,undefined) {
 'use strict';
 
-// Google object
-var google,
-    google_tag,
+var google_tag,
 
 //Private Properties
     entries_per_page = 50,  //Entries per page
@@ -24,9 +22,7 @@ function init () {
   //and pass loadFeedAPI
   assetReady(google_tag, function () {
 
-      google = window.google;
-
-      google.load('feeds', '1', {
+      window.google.load('feeds', '1', {
         "callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
         "nocss": true
         });
@@ -47,17 +43,15 @@ function setUpFeedURL() {
 }
 // (re)initalise the feed using google feed api
 function initFeed (num,callback) {
-  var google_feed; //Google Feed object
+  var google_feed;
 
   //Bugfix: for some odd reason, in firefox, Google obj returns 3 as an argument
   num === 3 && (num = undefined);
 
   //Number of entries to request
-  //Default to default entries per page if none specified, the number used for first page
   num || (num = entries_per_page); //Faster http://jsperf.com/conditional-assignment 
 
   //Callback to be called once feed has been received by GoogFeedAPI
-  //Default to postFeedInit
   callback || (callback = processFeed);
 
   //if getRSSLink fails, exit app with warning to the user
@@ -69,10 +63,10 @@ function initFeed (num,callback) {
 
   //TODO: make warning be sliding box. Unobtrusive warning;
 
-  google_feed = new google.feeds.Feed(rss_url);
+  google_feed = new window.google.feeds.Feed(rss_url);
 
   //Initialise feed settings
-  google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
+  google_feed.setResultFormat(window.google.feeds.Feed.JSON_FORMAT);
   google_feed.includeHistoricalEntries();
   google_feed.setNumEntries(num);
   google_feed.load(callback); //Default callback: processFeed
@@ -145,7 +139,7 @@ function getRSSLink () {
 
 //Use feed api to find feed URL
 function googleFeedLookup (url,callback){
-    google.feeds.lookupFeed(url,function(results){
+    window.google.feeds.lookupFeed(url,function(results){
       rss_url = results.url;
       console.log('Google Feed Lookup returned: ',results.url)
       callback();
@@ -158,7 +152,6 @@ function buildGoogleTag (){
   google_tag.src = 'https://www.google.com/jsapi';
   return google_tag;
 }
-
 
 function exitApp () {
 
