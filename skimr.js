@@ -127,13 +127,9 @@ function postFeedInit (results) {
 function eventDelegation () {
 
 	var doc = document;
-	if (doc.addEventListener){ //W3c
+	if (doc.addEventListener){ 
 		doc.addEventListener("keydown", keyEvents, false);
 		doc.addEventListener("click", clickEvents, false);
-	}
-	else if (doc.attachEvent){ //IE, ew... 
-		doc.attachEvent("onkeydown", keyEvents);
-		doc.attachEvent("onclick", clickEvents);
 	}
 
 	//Keyboard Events	
@@ -163,8 +159,7 @@ function eventDelegation () {
 
 	//Click Events
 	function clickEvents (event){
-		event || (event = window.event); //For IE. Ew...
-		var target = event.target || event.src; //W3C || IE. Ewy.. Gross... 
+		var target = event.target;
 
 		switch (target.id) {
 			case 'skimr-exit':
@@ -440,7 +435,7 @@ window.skimr = {
 	init:	init,
 	pagination: ui.pagination,
 	assetReady: assetReady
-}
+};
 
 //INIT
 init();
