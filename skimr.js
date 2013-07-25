@@ -1,10 +1,7 @@
 (function(window,undefined) {
 'use strict';
 
-var google_tag,
-
-//Private Properties
-    entries_per_page = 50,  //Entries per page
+var entries_per_page = 50,  
     num_max_entries = 250, //Google feed API maxes out at 250
     rss_url,
     rss_urls = {},
@@ -15,19 +12,16 @@ var google_tag,
 //Initilisation
 function init () {
 
-  google_tag = buildGoogleTag();
-  document.getElementsByTagName('head')[0].appendChild( google_tag );
+  var google_tag = buildGoogleTag();
+  document.querySelector('head').appendChild( google_tag );
 
-  //Check to see if the google tag is loaded
-  //and pass loadFeedAPI
-  assetReady(google_tag, function () {
+  google_tag.addEventListener('load', function () {
 
-      window.google.load('feeds', '1', {
-        "callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
-        "nocss": true
-        });
-
+    window.google.load('feeds', '1', {
+      "callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
+      "nocss": true
     });
+  });
 
   ui.buildUi();
 
@@ -43,13 +37,12 @@ function setUpFeedURL() {
 }
 // (re)initalise the feed using google feed api
 function initFeed (num,callback) {
-  var google_feed;
 
   //Bugfix: for some odd reason, in firefox, Google obj returns 3 as an argument
   num === 3 && (num = undefined);
 
   //Number of entries to request
-  num || (num = entries_per_page); //Faster http://jsperf.com/conditional-assignment 
+  num || (num = entries_per_page); // http://jsperf.com/conditional-assignment 
 
   //Callback to be called once feed has been received by GoogFeedAPI
   callback || (callback = processFeed);
@@ -63,7 +56,7 @@ function initFeed (num,callback) {
 
   //TODO: make warning be sliding box. Unobtrusive warning;
 
-  google_feed = new window.google.feeds.Feed(rss_url);
+  var google_feed = new window.google.feeds.Feed(rss_url);
 
   //Initialise feed settings
   google_feed.setResultFormat(window.google.feeds.Feed.JSON_FORMAT);
@@ -77,7 +70,6 @@ function initFeed (num,callback) {
 function processFeed(results) {
   var entries;
 
-
   //TODO WE NEED TO IMPLEMENT PROPER ERROR HANDLING
   //TODO If we do implement error handling, move to program code, not methods. I think...
   // If feed doesn't load or doesn't exist, exit app
@@ -87,7 +79,6 @@ function processFeed(results) {
     //throw 'Feed 404';// TODO MUST CATCH
   }
 
-  //Update skimr class properties
   current_results = results.feed.entries; 
 
   //TODO THIS IS WHERE NEW RESULTS SHOULD BE PASSED IN
@@ -110,7 +101,7 @@ function processFeed(results) {
 function getRSSLink () {
   var link_nodes = document.getElementsByTagName('link'),
       location = window.location, //local version of location object
-      rss_link = false, //false until proven found. Initialised as not found
+      rss_link = null, //false until proven found. Initialised as not found
       n = link_nodes.length,
       current_node,
       node_type;
@@ -170,20 +161,7 @@ function exitApp () {
 
 //Run fn when given asset is  loaded
 function assetReady(asset,fn) {
-  //the Google JS API is weird and takes a while to load,
-  //so we need to be sure to load it completely before we continue, hence the onload.
-  //http://www.nczonline.net/blog/2009/07/28/the-best-way-to-load-external-javascript/
-  //Note: I DID NOT TEST THIS IN IE
-  if (asset.readyState){  //IE
-    asset.onreadystatechange = function(){
-    if (asset.readyState == "loaded" ||asset.readyState == "complete"){
-        asset.onreadystatechange = null;
-        return fn();
-      }
-    };
-  } else {  //Other browsers, the decent and good ones (not IE)
     asset.addEventListener('load',fn);
-  }
 }
 
 var ui = {
@@ -240,8 +218,6 @@ var ui = {
   },
   deleteUi : function () {
     this.remElem(this.skimr_div);
-    this.remElem(google_tag);
-
   },
   remElem : function (elem) {
     return elem && elem.parentNode.removeChild(elem);
@@ -293,9 +269,10 @@ var ui = {
     fragment.appendChild(table);
     table.id = this.IDNAMESPACE + 'table';
 
-    offset || (offset = entries_per_page); // If no offset given, default entries per page
+    offset || (offset = entries_per_page); 
 
-    end = ((current_offset + offset) > current_results.length) ? // if desired offset will be more than results
+    // if desired offset will be more than results
+    end = ((current_offset + offset) > current_results.length) ? 
       current_results.length : //Just do remaining items
       current_offset + Math.abs(offset); 
 
@@ -419,7 +396,6 @@ window.skimr = {
   exitApp : exitApp,
   init: init,
   pagination: ui.pagination,
-  assetReady: assetReady
 };
 
 //INIT
