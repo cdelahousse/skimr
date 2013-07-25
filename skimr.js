@@ -34,7 +34,6 @@ function init () {
   //and pass loadFeedAPI
   assetReady(google_tag, function () {
 
-      //Move google loader object into local scope
       google = window.google;
 
       google.load('feeds', '1', {
@@ -46,7 +45,6 @@ function init () {
 
   ui.buildUi();
 
-  //Set events
   eventDelegation();
 }
 //Try to find RSS URL
@@ -71,7 +69,7 @@ function initFeed (num,callback) {
 
   //Callback to be called once feed has been received by GoogFeedAPI
   //Default to postFeedInit
-  callback || (callback = postFeedInit);
+  callback || (callback = processFeed);
 
   //if getRSSLink fails, exit app with warning to the user
   if (!rss_url) {
@@ -88,12 +86,12 @@ function initFeed (num,callback) {
   google_feed.setResultFormat(google.feeds.Feed.JSON_FORMAT);
   google_feed.includeHistoricalEntries();
   google_feed.setNumEntries(num);
-  google_feed.load(callback); //Default callback: postFeedInit
+  google_feed.load(callback); //Default callback: processFeed
 }
 
 //What to do once feed has been initialised
 //var results is passed for the google feed api (see initFeed)
-function postFeedInit (results) {
+function processFeed(results) {
   var entries;
 
 
