@@ -4,7 +4,6 @@
 var entries_per_page = 50,  
     num_max_entries = 250, //Google feed API maxes out at 250
     rss_url,
-    rss_urls = {},
     current_offset = 0;
 
 
@@ -18,7 +17,7 @@ function init () {
       initFeed.bind(null, entries_per_page,
         //Update UI
         processFeed.bind(null,
-          // Get the rest of the feeds
+          // Preload rest of the feed entries 
           initFeed.bind( null, num_max_entries, 
             //Update UI
             processFeed.bind( null, null ))))));
@@ -32,7 +31,10 @@ function loadGoogle(callback) {
 
   google_tag.addEventListener('load', function () {
     window.google.load('feeds', '1', {
-      "callback": callback, 
+      "callback": function () {
+        message("Google JS loader loaded");
+        callback.apply(this, Array.prototype.slice.call(arguments));
+      },
       "nocss": true
     });
   });
@@ -42,9 +44,12 @@ function loadGoogle(callback) {
 function determineFeedUrl(callback) {
   rss_url = getRSSLink(); //Find RSS URL
 
-  //run googleFeedLookup if no <link> rss exists
-  rss_url ? callback() : googleFeedLookup(window.location,callback);
-
+  if (rss_url) {
+    callback();
+  } else {
+    message("Feed URL not found, using Google Feed Lookup");
+    googleFeedLookup(window.location,callback);
+  }
 }
 
 //Get entries of a feed
@@ -55,12 +60,9 @@ function initFeed (number_to_grab,callback) {
 
   //if getRSSLink fails, exit app with warning to the user
   if (!rss_url) {
-    alert("Skimr can't work on this page");
-    exitApp();
+    error("Skimr can't work on this page");
     return;
   }
-
-  //TODO: make warning be sliding box. Unobtrusive warning;
 
   var google_feed = new window.google.feeds.Feed(rss_url);
 
@@ -78,9 +80,7 @@ function processFeed(callback,results) {
   //TODO WE NEED TO IMPLEMENT PROPER ERROR HANDLING
   // If feed doesn't load or doesn't exist, exit app
   if (results.status.code === 400){
-    alert('Woops, there is a problem with the feed'); 
-    exitApp();
-    //throw 'Feed 404';// TODO MUST CATCH
+    error('Woops, there is a problem with the feed');
   }
 
   ui.updateUi( results.feed.entries );
@@ -93,8 +93,8 @@ function processFeed(callback,results) {
 //the hypertext reference. If none, returns false
 function getRSSLink () {
   var link_nodes = document.getElementsByTagName('link'),
-      location = window.location, //local version of location object
-      rss_link = null, //false until proven found. Initialised as not found
+      location = window.location, 
+      rss_link = null, 
       n = link_nodes.length,
       current_node,
       node_type;
@@ -125,7 +125,7 @@ function getRSSLink () {
 function googleFeedLookup (url,callback){
     window.google.feeds.lookupFeed(url,function(results){
       rss_url = results.url;
-      console.log('Google Feed Lookup returned: ',results.url);
+      message('Google Feed Lookup returned: ' + results.url);
       callback();
   });
 }
@@ -143,6 +143,11 @@ function exitApp () {
   //For outside run script test (window.skmir.exitApp)
   return true;
 }
+
+//Generic message to user
+function message (msg, callback) { ui.message (msg, callback); }
+//Generic error to user
+function error (msg, callback) { ui.error(msg, callback); exitApp(); }
 
 var ui = {
   //Constants
@@ -338,6 +343,16 @@ var ui = {
           break;
       }
     }
+  },
+  //Send message to user
+  message : function (msg, callback) {
+    console.log(msg);
+    callback && callback();
+  },
+  //Send error to user
+  error : function (msg, callback) {
+    alert(msg);
+    callback();
   },
   css : (function () {/*
     html {position: relative;}
