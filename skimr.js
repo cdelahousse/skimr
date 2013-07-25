@@ -5,8 +5,7 @@ var entries_per_page = 50,
     num_max_entries = 250, //Google feed API maxes out at 250
     rss_url,
     rss_urls = {},
-    current_offset = 0,
-    current_results = null;
+    current_offset = 0;
 
 
 //Initilisation
@@ -85,19 +84,13 @@ function processFeed(results) {
     //throw 'Feed 404';// TODO MUST CATCH
   }
 
-  current_results = results.feed.entries; 
-
-  //TODO THIS IS WHERE NEW RESULTS SHOULD BE PASSED IN
   ui.updateUi( results.feed.entries );
 
   //Preload remaining for pagination
-  initFeed(num_max_entries,function (){
-    current_results = this.feed.entries;
-    //XXX SHOULD BE THIS ui.updateUi( results.feed.entries );
+  initFeed(num_max_entries,function (r){
 
-    //Allow Pagination via next button
-    // TODO Refactor this out
-    current_results.length >= entries_per_page && (ui.next_anchor.className = 'show');
+    ui.updateUi( r.feed.entries );
+
   });
 }
 
@@ -138,7 +131,7 @@ function getRSSLink () {
 function googleFeedLookup (url,callback){
     window.google.feeds.lookupFeed(url,function(results){
       rss_url = results.url;
-      console.log('Google Feed Lookup returned: ',results.url)
+      console.log('Google Feed Lookup returned: ',results.url);
       callback();
   });
 }
@@ -155,16 +148,17 @@ function exitApp () {
   window.skimr_script && (delete window.skimr_script); 
   //For outside run script test (window.skmir.exitApp)
   return true;
-
 }
 
 var ui = {
   //Constants
   NAMESPACE : 'skimr',
   IDNAMESPACE : 'skimr-' ,
-  current_results : [], //TODO Make this work
 
-  //UI Elems
+  entries : [], 
+
+  //UI Elems 
+  //TODO Refactor these data members out
   skimr_div : null,
   loading_div : null,
   list_table : null,
@@ -185,10 +179,10 @@ var ui = {
     var dashboard_div = this.buildDashboard();
     this.loading_div = this.buildTag('div', this.IDNAMESPACE + 'loading', 'Loading...');
 
-    fragment.appendChild( this.skimr_div );
     this.skimr_div.appendChild( this.loading_div );
     this.skimr_div.appendChild( dashboard_div );
     this.skimr_div.appendChild( css_tag );
+    fragment.appendChild( this.skimr_div );
 
     document.body.appendChild(fragment);
 
@@ -197,14 +191,24 @@ var ui = {
   },
   //Refactor so that current_result is local
   updateUi : function (current_results) {
+
+    this.entries = current_results || this.entries; 
+
     //When we have results, no need for loading
     if (this.loading_div) {
       this.remElem(this.loading_div);
       delete this.loading_div;
     }
 
+
+    var table = document.getElementById(this.IDNAMESPACE + 'table');
+    if (table) this.remElem(table);
+
+    this.next_anchor.className = entries_per_page >= (this.entries.length - current_offset) ? 'hide': 'show';
+    this.prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
+
     //Element that houses feed links
-    this.list_table = this.buildListTable();
+    this.list_table = this.buildListTable(entries_per_page);
 
     //Append to main element
     this.skimr_div.appendChild(this.list_table);
@@ -249,26 +253,25 @@ var ui = {
     return anchor;
   },
   buildListTable : function buildListTable (offset) {
-    var fragment = document.createDocumentFragment(),
-        table = document.createElement('table'),
+    var table = document.createElement('table'),
         table_contents = "",
         pub_date,
-        entries = current_results,
+        entries = this.entries,
         entry,
         end,
         yy,
         mm,
         dd;
 
-    fragment.appendChild(table);
     table.id = this.IDNAMESPACE + 'table';
 
     offset || (offset = entries_per_page); 
 
     // if desired offset will be more than results
-    end = ((current_offset + offset) > current_results.length) ? 
-      current_results.length : //Just do remaining items
+    end = ((current_offset + offset) > this.entries.length ) ? 
+      this.entries.length : //Just do remaining items
       current_offset + Math.abs(offset); 
+
 
     //Creates anchor tags, adds hypertext reference
     for (var i = current_offset; i < end; i++) { 
@@ -289,17 +292,13 @@ var ui = {
     table.innerHTML = '<tr><th>yy/mm/dd</th>' +
         '<th id="skimr-title">Skimr</th></tr>\n' + table_contents;
 
-    return fragment;
+    return table;
   },
   pagination : function (offset) {
 
-    current_offset += offset;
+    current_offset += offset; //XXX Refactor out
 
-    this.next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
-    this.prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
-    this.remElem(document.getElementById(this.IDNAMESPACE + 'table'));
-    this.list_table = this.buildListTable(offset); //Rebuild link list
-    this.skimr_div.appendChild(this.list_table); 
+    this.updateUi();
   },
   attachEvents : function () {
 
@@ -322,7 +321,7 @@ var ui = {
           //Right
         case 39:
           //don't go forward when none lie beyond current page listings
-          entries_per_page >= (current_results.length - current_offset) || ui.pagination(entries_per_page);
+          entries_per_page >= (this.entries.length - current_offset) || this.pagination(entries_per_page);
           break;
       }
     }
