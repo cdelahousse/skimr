@@ -3,17 +3,7 @@
 
 // Google object
 var google,
-
-//Created document and UI elements
     google_tag,
-    css_tag,
-    skimr_div,//container div
-    loading_div,
-    list_table,
-    dashboard_div,
-    exit_anchor,
-    next_anchor,
-    prev_anchor,
 
 //Private Properties
     entries_per_page = 50,  //Entries per page
@@ -117,7 +107,7 @@ function processFeed(results) {
 
     //Allow Pagination via next button
     // TODO Refactor this out
-    current_results.length >= entries_per_page && (next_anchor.className = 'show');
+    current_results.length >= entries_per_page && (ui.next_anchor.className = 'show');
   });
 }
 
@@ -260,6 +250,14 @@ var ui = {
   NAMESPACE : 'skimr',
   IDNAMESPACE : 'skimr-' ,
   current_results : [], //TODO Make this work
+
+  //UI Elems
+  skimr_div : null,
+  loading_div : null,
+  list_table : null,
+  next_anchor :null,
+  prev_anchor :null,
+
   buildUi : function () {
 
     //Scroll to top
@@ -269,35 +267,35 @@ var ui = {
 
     var fragment = document.createDocumentFragment();
 
-    skimr_div = this.buildTag('div', this.NAMESPACE, '');
-    css_tag = this.buildTag('style','',this.css); 
-    loading_div = this.buildTag('div', this.IDNAMESPACE + 'loading', 'Loading...');
-    dashboard_div = this.buildDashboard();
+    this.skimr_div = this.buildTag('div', this.NAMESPACE, '');
+    var css_tag = this.buildTag('style','',this.css); 
+    var dashboard_div = this.buildDashboard();
+    this.loading_div = this.buildTag('div', this.IDNAMESPACE + 'loading', 'Loading...');
 
-    fragment.appendChild( skimr_div );
-    skimr_div.appendChild( loading_div );
-    skimr_div.appendChild( dashboard_div );
-    skimr_div.appendChild( css_tag );
+    fragment.appendChild( this.skimr_div );
+    this.skimr_div.appendChild( this.loading_div );
+    this.skimr_div.appendChild( dashboard_div );
+    this.skimr_div.appendChild( css_tag );
 
     document.body.appendChild(fragment);
 
   },
   //Refactor so that current_result is local
   updateUi : function (current_results) {
-    if (loading_div) {
-      this.remElem(loading_div);
-      loading_div = undefined;
+    //When we have results, no need for loading
+    if (this.loading_div) {
+      this.remElem(this.loading_div);
+      delete this.loading_div;
     }
 
     //Element that houses feed links
-    list_table = this.buildListTable();
+    this.list_table = this.buildListTable();
     //Append to main element
-    skimr_div.appendChild(list_table);
+    this.skimr_div.appendChild(this.list_table);
 
   },
   deleteUi : function () {
-    this.remElem(skimr_div);
-    this.remElem(css_tag);
+    this.remElem(this.skimr_div);
     this.remElem(google_tag);
 
   },
@@ -314,14 +312,15 @@ var ui = {
     var dashboard_div = this.buildTag('div', this.IDNAMESPACE + 'dashboard', ''); 
 
     var buildAnchor = this.buildAnchor;
-    exit_anchor = buildAnchor('Exit',this.IDNAMESPACE + 'exit'); 
-    //Default: hide class while preloading the next google feed results 
-    next_anchor = buildAnchor('Next',this.IDNAMESPACE + 'next','hide');
-    prev_anchor = buildAnchor('Prev',this.IDNAMESPACE + 'prev','hide');
+    var exit_anchor = buildAnchor('Exit',this.IDNAMESPACE + 'exit'); 
 
-    dashboard_div.appendChild(prev_anchor);
+    //Default: hide class while preloading the next google feed results 
+    this.next_anchor = buildAnchor('Next',this.IDNAMESPACE + 'next','hide');
+    this.prev_anchor = buildAnchor('Prev',this.IDNAMESPACE + 'prev','hide');
+
+    dashboard_div.appendChild(this.prev_anchor);
     dashboard_div.appendChild(exit_anchor);
-    dashboard_div.appendChild(next_anchor);
+    dashboard_div.appendChild(this.next_anchor);
 
     return dashboard_div; 
 
@@ -381,11 +380,11 @@ var ui = {
 
     current_offset += offset;
 
-    next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
-    prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
+    this.next_anchor.className = offset >= (current_results.length - current_offset) ? 'hide': 'show';
+    this.prev_anchor.className = current_offset > 0 ? 'show' : 'hide';
     this.remElem(document.getElementById(this.IDNAMESPACE + 'table'));
-    list_table = this.buildListTable(offset); //Rebuild link list
-    skimr_div.appendChild(list_table); 
+    this.list_table = this.buildListTable(offset); //Rebuild link list
+    this.skimr_div.appendChild(this.list_table); 
   },
   css : (function () {/*
     html {position: relative;}
