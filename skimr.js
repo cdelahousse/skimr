@@ -12,22 +12,28 @@ var entries_per_page = 50,
 //Initilisation
 function init () {
 
-  var google_tag = buildGoogleTag();
+
+  loadGoogle( determineFeedUrl );
+  ui.buildUi();
+
+}
+
+// Load Google JS loader
+function loadGoogle(callback) {
+  var google_tag = document.createElement('script');
+  google_tag.src = '//www.google.com/jsapi';
   document.querySelector('head').appendChild( google_tag );
 
   google_tag.addEventListener('load', function () {
-
     window.google.load('feeds', '1', {
-      "callback": setUpFeedURL, //Once the feed api is loaded, it calls initFeed() 
+      "callback": callback, 
       "nocss": true
     });
   });
 
-  ui.buildUi();
-
 }
 //Try to find RSS URL
-function setUpFeedURL() {
+function determineFeedUrl() {
   rss_url = getRSSLink(); //Find RSS URL
 
   //run googleFeedLookup if no <link> rss exists
@@ -137,13 +143,6 @@ function googleFeedLookup (url,callback){
   });
 }
 
-//builds that tag that will load the google api
-function buildGoogleTag (){ 
-  var google_tag = document.createElement('script');
-  google_tag.src = 'https://www.google.com/jsapi';
-  return google_tag;
-}
-
 function exitApp () {
 
   ui.deleteUi();
@@ -157,11 +156,6 @@ function exitApp () {
   //For outside run script test (window.skmir.exitApp)
   return true;
 
-}
-
-//Run fn when given asset is  loaded
-function assetReady(asset,fn) {
-    asset.addEventListener('load',fn);
 }
 
 var ui = {
